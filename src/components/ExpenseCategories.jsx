@@ -1,10 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#FF6B6B'];
 
+// Hook personalizado para detectar el tamaño de la ventana
+function useWindowSize() {
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    }
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  return windowSize;
+}
+
 const ExpenseCategories = ({ categories }) => {
   const hasData = categories && categories.length > 0;
+  const { width } = useWindowSize();
+  const isMobile = width <= 480;
   
   return (
     <div className="category-chart-full">
@@ -18,12 +42,12 @@ const ExpenseCategories = ({ categories }) => {
                 data={categories} 
                 cx="50%" 
                 cy="50%" 
-                innerRadius={80} 
-                outerRadius={120} 
+                innerRadius={isMobile ? 50 : 80} 
+                outerRadius={isMobile ? 90 : 120} 
                 fill="#8884d8"
                 paddingAngle={5}
                 dataKey="value"
-                label={({name, value}) => `${name}: $${value}`}
+                label={({name, value}) => isMobile ? `$${value}` : `${name}: $${value}`}
               >
                 {categories.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
