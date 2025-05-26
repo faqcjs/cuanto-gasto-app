@@ -1,7 +1,7 @@
 import React from 'react';
 import { LinearProgress } from '@mui/material';
 
-const BudgetSummary = ({ totalSpent, monthlyBudget, openBudgetModal }) => {
+const BudgetSummary = ({ totalSpent, monthlyBudget, onBudgetClick, onDeleteBudget }) => {
   const hasBudget = monthlyBudget > 0;
   
   return (
@@ -40,20 +40,39 @@ const BudgetSummary = ({ totalSpent, monthlyBudget, openBudgetModal }) => {
           </div>
         </>
       ) : (
-        <div className="empty-state">
-          <p>No has establecido un presupuesto mensual</p>
-          <p>Establece tu presupuesto para comenzar a controlar tus gastos</p>
-        </div>
+        <>
+          {/* Mostrar el gasto total en negativo cuando no hay presupuesto */}
+          <div className="budget-remaining budget-negative">
+            <h3>Total Gastado</h3>
+            <h1 className="negative">
+              -${totalSpent.toFixed(2)}
+            </h1>
+          </div>
+          
+          <div className="empty-state">
+            <p>No has establecido un presupuesto mensual</p>
+            <p>Establece tu presupuesto para comenzar a controlar tus gastos</p>
+          </div>
+        </>
       )}
       
-      {/* Botón para abrir el modal de presupuesto */}
+      {/* Botones para gestionar el presupuesto */}
       <div className="budget-actions">
         <button 
           className="primary-button budget-button"
-          onClick={openBudgetModal}
+          onClick={onBudgetClick}
         >
           {hasBudget ? 'Modificar presupuesto' : 'Establecer presupuesto'}
         </button>
+        
+        {hasBudget && (
+          <button 
+            className="danger-button budget-button"
+            onClick={onDeleteBudget}
+          >
+            Eliminar presupuesto
+          </button>
+        )}
       </div>
     </div>
   );

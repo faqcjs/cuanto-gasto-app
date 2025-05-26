@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 
 const CATEGORY_OPTIONS = [
@@ -17,6 +17,18 @@ const paymentMethods = [
 ];
 
 const AddExpense = ({ expense, setExpense, onAdd, setActiveTab }) => {
+  const [allCategories, setAllCategories] = useState([...CATEGORY_OPTIONS]);
+  
+  // Cargar categorías personalizadas
+  useEffect(() => {
+    const customCategories = JSON.parse(localStorage.getItem('customCategories')) || [];
+    const customCategoryOptions = customCategories.map(cat => ({
+      value: cat,
+      label: cat
+    }));
+    
+    setAllCategories([...CATEGORY_OPTIONS, ...customCategoryOptions]);
+  }, []);
   return (
     <div className="add-expense-card-full">
       <h2>Agregar gasto</h2>
@@ -46,6 +58,18 @@ const AddExpense = ({ expense, setExpense, onAdd, setActiveTab }) => {
         </div>
 
         <div className="form-group">
+          <label htmlFor="description">Descripción</label>
+          <input
+            type="text"
+            id="description"
+            value={expense.description || ''}
+            onChange={(e) => setExpense({ ...expense, description: e.target.value })}
+            placeholder="Ej: Compra en supermercado"
+            required
+          />
+        </div>
+
+        <div className="form-group">
           <label htmlFor="category">Categoría</label>
           <select
             id="category"
@@ -53,7 +77,7 @@ const AddExpense = ({ expense, setExpense, onAdd, setActiveTab }) => {
             onChange={(e) => setExpense({ ...expense, category: e.target.value })}
             required
           >
-            {CATEGORY_OPTIONS.map((cat) => (
+            {allCategories.map((cat) => (
               <option key={cat.value} value={cat.value}>
                 {cat.label}
               </option>

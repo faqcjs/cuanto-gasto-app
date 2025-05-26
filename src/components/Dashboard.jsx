@@ -4,6 +4,9 @@ import BudgetSummary from './BudgetSummary';
 import ExpenseCategories from './ExpenseCategories';
 import AddExpense from './AddExpense';
 import BudgetModal from './BudgetModal';
+import ConfirmationModal from './ConfirmationModal';
+import Navbar from './Navbar';
+import Settings from './Settings';
 import { 
   LinearProgress, 
   TextField, 
@@ -33,10 +36,13 @@ const Dashboard = () => {
   const [monthlyBudget, setMonthlyBudget] = useState(0);
   const [tempBudget, setTempBudget] = useState(0);
   const [categories, setCategories] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [activeTab, setActiveTab] = useState('resumen');
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [expense, setExpense] = useState({
     amount: '',
+    description: '',
     category: 'Comida',
     paymentMethod: 'efectivo',
     date: format(new Date(), 'yyyy-MM-dd')
@@ -47,6 +53,21 @@ const Dashboard = () => {
     { value: 'transferencia', label: 'Transferencia' }
   ]);
 
+  // Función para eliminar el presupuesto
+  const deleteBudget = () => {
+    localStorage.removeItem('monthlyBudget');
+    setMonthlyBudget(0);
+    setTempBudget(0);
+  };
+  
+  // Función para eliminar un gasto individual
+  const deleteExpense = (expenseId) => {
+    const updatedExpenses = expenses.filter(expense => expense.id !== expenseId);
+    localStorage.setItem('gastos', JSON.stringify(updatedExpenses));
+    setExpenses(updatedExpenses);
+    loadData(); // Recargar los datos para actualizar las categorías y totales
+  };
+
   // Función para cargar datos
   const loadData = () => {
     const savedData = JSON.parse(localStorage.getItem('gastos')) || [];
@@ -54,6 +75,9 @@ const Dashboard = () => {
     
     setMonthlyBudget(Number(savedBudget));
     setTempBudget(Number(savedBudget));
+    
+    // Guardar los gastos completos
+    setExpenses(savedData);
     
     // Calcular total gastado
     const total = savedData.reduce((acc, item) => acc + Number(item.amount), 0);
@@ -79,7 +103,8 @@ const Dashboard = () => {
     const savedData = JSON.parse(localStorage.getItem('gastos')) || [];
     const updatedExpenses = [...savedData, { ...newExpense, id: Date.now(), amount: Number(newExpense.amount) }];
     localStorage.setItem('gastos', JSON.stringify(updatedExpenses));
-    loadData(); // Recargar los datos para actualizar el dashboard
+    setExpenses(updatedExpenses); // Actualizar el estado de expenses directamente
+    loadData();
   };
 
   useEffect(() => {
@@ -89,21 +114,8 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-wrapper">
-      {/* Barra de navegación con pestañas */}
-      <div className="dashboard-tabs">
-        <button 
-          className={`tab-button ${activeTab === 'resumen' ? 'active' : ''}`}
-          onClick={() => setActiveTab('resumen')}
-        >
-          Resumen
-        </button>
-        <button 
-          className={`tab-button ${activeTab === 'agregar' ? 'active' : ''}`}
-          onClick={() => setActiveTab('agregar')}
-        >
-          Agregar Gasto
-        </button>
-      </div>
+      {/* Navbar desplegable */}
+      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Contenido de las pestañas */}
       <div className="dashboard-content">
@@ -112,7 +124,7 @@ const Dashboard = () => {
           <div className="dashboard-container" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
             {categories.length === 0 && monthlyBudget === 0 ? (
               <div className="budget-summary">
-                <h2>Resumen de presupuesto</h2>
+                <h2>Resumen del presupuesto</h2>
                 <div className="empty-state">
                   <p>No hay datos para mostrar</p>
                   <p>Ingresa tu presupuesto mensual y luego agrega gastos para ver estadísticas</p>
@@ -127,21 +139,19 @@ const Dashboard = () => {
                 </div>
               </div>
             ) : (
-              <>
+              <div className="dashboard-content">
                 <BudgetSummary 
-                  totalSpent={totalSpent}
-                  monthlyBudget={monthlyBudget}
-                  openBudgetModal={() => setIsBudgetModalOpen(true)}
+                  totalSpent={totalSpent} 
+                  monthlyBudget={monthlyBudget} 
+                  onBudgetClick={() => setIsBudgetModalOpen(true)}
+                  onDeleteBudget={() => setIsDeleteModalOpen(true)}
                 />
-                {categories.length > 0 ? (
-                  <ExpenseCategories categories={categories} />
-                ) : (
-                  <div className="empty-state category-chart-full">
-                    <p>No hay gastos registrados</p>
-                    <p>Agrega gastos para ver estadísticas por categoría</p>
-                  </div>
-                )}
-              </>
+                <ExpenseCategories 
+                  categories={categories} 
+                  expenses={expenses} 
+                  onDeleteExpense={deleteExpense} 
+                />
+              </div>
             )}
           </div>
         )}
@@ -153,6 +163,17 @@ const Dashboard = () => {
           tempBudget={tempBudget}
           setTempBudget={setTempBudget}
           setMonthlyBudget={setMonthlyBudget}
+        />
+        
+        {/* Modal de Confirmación para eliminar presupuesto */}
+        <ConfirmationModal 
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirm={deleteBudget}
+          title="Eliminar Presupuesto"
+          message="¿Estás seguro de que deseas eliminar el presupuesto mensual? Esta acción no se puede deshacer."
+          confirmButtonText="Eliminar"
+          cancelButtonText="Cancelar"
         />
 
 
@@ -166,6 +187,13 @@ const Dashboard = () => {
               onAdd={onAdd}
               setActiveTab={setActiveTab}
             />
+          </div>
+        )}
+        
+        {/* Pestaña de Ajustes */}
+        {activeTab === 'ajustes' && (
+          <div className="dashboard-container" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <Settings />
           </div>
         )}
       </div>

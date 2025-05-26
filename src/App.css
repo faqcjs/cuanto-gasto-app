@@ -59,13 +59,14 @@ body {
   box-shadow: var(--shadow-sm);
   position: fixed;
   top: 0;
-  left: 0;
+  left: 60px; /* Espacio para la navbar */
   right: 0;
   z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  width: calc(100% - 60px);
+  transition: left 0.3s ease, width 0.3s ease;
 }
 
 .app-logo {
@@ -252,6 +253,20 @@ body {
   cursor: pointer; /* Indicates it's clickable */
 }
 
+.budget-remaining {
+  background-color: var(--card-bg);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  text-align: center;
+  margin-top: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.budget-negative {
+  background-color: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
 .budget-summary {
   background-color: var(--surface-color);
   padding: 1.5rem;
@@ -434,6 +449,108 @@ body {
   margin: 0.5rem 1rem;
 }
 
+/* Estilos para la navbar desplegable */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background-color: var(--nav-bg);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+  width: 60px;
+  box-shadow: var(--shadow-md);
+  padding-top: 60px; /* Espacio para el header */
+}
+
+.navbar-open {
+  width: 220px;
+}
+
+.navbar-toggle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.navbar-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-items {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+  overflow: hidden;
+}
+
+.navbar-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+  width: 100%;
+  text-align: left;
+}
+
+.navbar-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.navbar-item.active {
+  color: var(--primary-color);
+  background-color: rgba(33, 150, 243, 0.1);
+}
+
+.navbar-icon {
+  margin-right: 1rem;
+  font-size: 1.5rem;
+}
+
+.navbar-text {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.navbar-open .navbar-text {
+  opacity: 1;
+}
+
+/* Ajustar el contenido principal para dar espacio a la navbar */
+.main-content {
+  padding-left: 60px;
+}
+
+/* Estilos para el mensaje de confirmación */
+.confirmation-message {
+  margin: 1.5rem 0;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  text-align: center;
+}
+
 /* Modal styles */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -516,6 +633,8 @@ body {
   margin-top: 1rem;
   display: flex;
   justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 /* Forms */
@@ -571,6 +690,26 @@ body {
   font-family: var(--font-heading);
   font-weight: 500;
   letter-spacing: 0.5px;
+}
+
+/* Media queries para la navbar en dispositivos móviles */
+@media (max-width: 768px) {
+  .navbar {
+    width: 50px;
+  }
+  
+  .navbar-open {
+    width: 200px;
+  }
+  
+  .app-header {
+    left: 50px;
+    width: calc(100% - 50px);
+  }
+  
+  .main-content {
+    padding-left: 50px;
+  }
 }
 
 /* Media queries para dispositivos móviles */
@@ -663,8 +802,81 @@ body {
   }
 }
 
+/* Estilos para el dashboard */
+.dashboard-content {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.budget-summary,
+.category-chart-full {
+  flex: 1;
+  min-width: 300px;
+}
+
 /* Media queries para pantallas muy pequeñas */
 @media (max-width: 480px) {
+  .dashboard-content {
+    flex-direction: column;
+  }
+  
+  .budget-summary,
+  .category-chart-full {
+    width: 100%;
+    min-width: 100%;
+  }
+  /* Ajustes para la navbar en pantallas muy pequeñas */
+  .navbar {
+    width: 0;
+    overflow: visible;
+  }
+  
+  .navbar-toggle {
+    background-color: var(--nav-bg);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: var(--shadow-sm);
+    z-index: 1001;
+  }
+  
+  .navbar-open {
+    width: 200px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  
+  .navbar-items {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .navbar-open .navbar-items {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  .app-header {
+    left: 0;
+    width: 100%;
+  }
+  
+  .main-content {
+    padding-left: 0;
+  }
+  
+  /* Overlay para cerrar la navbar cuando se hace clic fuera de ella */
+  .navbar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
   .app-logo {
     font-size: 1.5rem;
   }
@@ -720,8 +932,24 @@ body {
 }
 
 .primary-button:hover {
-  background-color: #1565C0;
-  transform: translateY(-1px);
+  background-color: #1976D2;
+}
+
+.danger-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-heading);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.danger-button:hover {
+  background-color: #d32f2f;
 }
 
 /* Tables */
@@ -816,4 +1044,292 @@ select:focus {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Estilos para el filtro de categorías */
+.category-filter {
+  margin: 1rem 0;
+}
+
+.filter-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Estilos para los badges de categorías */
+.category-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.category-badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background-color: transparent;
+  border: 2px solid var(--border-color);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-badge.active {
+  color: white;
+  border-color: transparent;
+}
+
+.category-badge:hover {
+  opacity: 0.8;
+}
+
+/* Estilos para los gastos filtrados */
+.filtered-expenses {
+  margin-top: 1rem;
+}
+
+.filtered-category-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: var(--border-radius);
+  background-color: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.filtered-category-title .category-color {
+  width: 20px;
+  height: 20px;
+}
+
+.expense-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.expense-item {
+  display: grid;
+  grid-template-columns: 80px 1fr auto auto;
+  align-items: center;
+  padding: 0.8rem;
+  border-radius: var(--border-radius);
+  background-color: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.delete-expense-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-left: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.delete-expense-btn:hover {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+}
+
+.delete-icon {
+  font-weight: bold;
+  line-height: 1;
+}
+
+.expense-date {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.expense-description {
+  font-weight: 500;
+  padding-left: 0.5rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.expense-amount {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Estilos para hacer los elementos de categoría clickeables */
+.category-item {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.category-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Estilos para la página de ajustes */
+.settings-container {
+  background-color: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .settings-container {
+    padding: 1rem;
+    margin: 0 0.5rem;
+  }
+}
+
+.settings-section {
+  margin-bottom: 2rem;
+}
+
+.settings-section h3 {
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 480px) {
+  .settings-section h3 {
+    font-size: 1.1rem;
+  }
+}
+
+.settings-description {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 480px) {
+  .settings-description {
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+  }
+}
+
+.add-category-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 480px) {
+  .add-category-form {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+.category-input {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.add-category-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+@media (max-width: 480px) {
+  .add-category-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem;
+  }
+}
+
+.add-category-btn:hover {
+  background-color: #1976D2;
+}
+
+.add-category-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.custom-categories {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.custom-category-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  word-break: break-word;
+}
+
+@media (max-width: 480px) {
+  .custom-category-item {
+    padding: 0.75rem 0.75rem;
+  }
+  
+  .custom-category-item span {
+    max-width: 80%;
+  }
+}
+
+.delete-category-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.delete-category-btn:hover {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+}
+
+.no-categories {
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-top: 1rem;
 }
