@@ -112,6 +112,7 @@ const Dashboard = () => {
     loadData();
   }, []);
 
+
   return (
     <div className="dashboard-wrapper">
       {/* Navbar desplegable */}
@@ -139,7 +140,7 @@ const Dashboard = () => {
                 </div>
               </div>
             ) : (
-              <div className="dashboard-content">
+              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
                 <BudgetSummary 
                   totalSpent={totalSpent} 
                   monthlyBudget={monthlyBudget} 

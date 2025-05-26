@@ -1,0 +1,51 @@
+/* Estilos para el dashboard */
+.dashboard-wrapper {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--background-color);
+  overflow-x: hidden;
+}
+
+.dashboard-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  margin-left: 60px; /* Espacio para la navbar */
+  box-sizing: border-box;
+}
+
+.dashboard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+/* Media queries para el dashboard */
+@media (max-width: 768px) {
+  .dashboard-content {
+    margin-left: 50px;
+    padding: 0.5rem;
+  }
+  
+  .dashboard-container {
+    padding: 0 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard-content {
+    padding: 0.25rem;
+  }
+  
+  .dashboard-container {
+    padding: 0 0.25rem;
+  }
+}
