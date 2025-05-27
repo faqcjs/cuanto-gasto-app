@@ -203,7 +203,7 @@ body {
   justify-content: center;
   align-items: center;
   width: 100%;
-  padding: 0 1rem;
+  
   box-sizing: border-box;
 }
 
@@ -855,9 +855,7 @@ body {
     padding: 1.25rem;
   }
   
-  .dashboard-container {
-    padding: 0 0.75rem;
-  }
+  
   
   .tab-button {
     padding: 0.7rem 0.9rem;
@@ -928,7 +926,8 @@ body {
   
   .main-content {
     margin-left: 0;
-    padding-left: 0;
+    
+    padding: 0;
   }
   
   /* Overlay para cerrar la navbar cuando se hace clic fuera de ella */
@@ -952,10 +951,7 @@ body {
     width: calc(100% - 2rem);
   }
   
-  .main-content {
-    padding: 0.75rem;
-    padding-top: 4.5rem;
-  }
+  
   
   .card, 
   .budget-summary, 
@@ -1055,7 +1051,6 @@ body {
   }
   
   .main-content {
-    padding: 1rem;
     padding-top: 6rem;
   }
   
