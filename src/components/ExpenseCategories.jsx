@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { 
+  PieChart, Pie, Cell, ResponsiveContainer, 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  LineChart, Line, Area, AreaChart, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
+} from 'recharts';
+import { format } from 'date-fns';
 import ConfirmationModal from './ConfirmationModal';
+import { FaChartPie, FaChartBar, FaChartLine, FaChartArea, FaRegDotCircle } from 'react-icons/fa';
 
 // Colores para las categorías
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#FF6B6B'];
@@ -42,7 +48,9 @@ const ExpenseCategories = ({ categories, expenses, onDeleteExpense }) => {
   const [filteredDebts, setFilteredDebts] = useState([]);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [chartType, setChartType] = useState('pie'); // 'pie' o 'bar'
+  const [chartType, setChartType] = useState('pie'); // 'pie', 'bar', 'line', 'area', 'radar'
+  const [timeSeriesData, setTimeSeriesData] = useState([]);
+  const [comparisonData, setComparisonData] = useState([]);
   
   const hasData = categories && categories.length > 0;
   const { width } = useWindowSize();
@@ -79,6 +87,50 @@ const ExpenseCategories = ({ categories, expenses, onDeleteExpense }) => {
       setFilteredDebts([]);
     }
   }, [selectedCategory, expenses]);
+  
+  // Preparar datos para los gráficos de línea y radar
+  useEffect(() => {
+    if (expenses && expenses.length > 0) {
+      // Preparar datos para el gráfico de línea (gastos diarios)
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+      
+      // Filtrar gastos del mes actual
+      const currentMonthExpenses = expenses.filter(expense => {
+        const expenseDate = new Date(expense.date);
+        return expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear;
+      });
+      
+      // Agrupar por día
+      const dailyExpenses = {};
+      currentMonthExpenses.forEach(expense => {
+        const dateStr = format(new Date(expense.date), 'yyyy-MM-dd');
+        if (!dailyExpenses[dateStr]) {
+          dailyExpenses[dateStr] = 0;
+        }
+        dailyExpenses[dateStr] += Number(expense.amount);
+      });
+      
+      // Convertir a array para Recharts
+      const timeSeriesArray = Object.keys(dailyExpenses).map(date => ({
+        date: format(new Date(date), 'dd/MM'),
+        gasto: dailyExpenses[date],
+        presupuesto: Number(localStorage.getItem('monthlyBudget') || 0) / 30 // Presupuesto diario aproximado
+      })).sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      setTimeSeriesData(timeSeriesArray);
+      
+      // Preparar datos para el gráfico de radar (comparación de categorías)
+      const categoryData = categories.map(cat => ({
+        category: cat.name,
+        value: cat.value,
+        fullMark: Math.max(...categories.map(c => c.value)) * 1.2 // Valor máximo para el radar
+      }));
+      
+      setComparisonData(categoryData);
+    }
+  }, [expenses, categories]);
   
   // Función para seleccionar una categoría
   const handleCategorySelect = (categoryName) => {
@@ -151,19 +203,42 @@ const ExpenseCategories = ({ categories, expenses, onDeleteExpense }) => {
         selectedCategory === null ? (
           // Mostrar todas las categorías con el gráfico seleccionado
           <>
-            {/* Botón para cambiar tipo de gráfico */}
+            {/* Botones para cambiar tipo de gráfico */}
             <div className="chart-type-toggle">
               <button 
                 className={`chart-type-btn ${chartType === 'pie' ? 'active' : ''}`}
                 onClick={() => setChartType('pie')}
+                title="Gráfico Circular"
               >
-                Gráfico Circular
+                <FaChartPie className="chart-icon" /> Circular
               </button>
               <button 
                 className={`chart-type-btn ${chartType === 'bar' ? 'active' : ''}`}
                 onClick={() => setChartType('bar')}
+                title="Gráfico de Barras"
               >
-                Gráfico de Barras
+                <FaChartBar className="chart-icon" /> Barras
+              </button>
+              <button 
+                className={`chart-type-btn ${chartType === 'line' ? 'active' : ''}`}
+                onClick={() => setChartType('line')}
+                title="Gráfico de Líneas"
+              >
+                <FaChartLine className="chart-icon" /> Tendencia
+              </button>
+              <button 
+                className={`chart-type-btn ${chartType === 'area' ? 'active' : ''}`}
+                onClick={() => setChartType('area')}
+                title="Gráfico de Área"
+              >
+                <FaChartArea className="chart-icon" /> Área
+              </button>
+              <button 
+                className={`chart-type-btn ${chartType === 'radar' ? 'active' : ''}`}
+                onClick={() => setChartType('radar')}
+                title="Gráfico de Radar"
+              >
+                <FaRegDotCircle className="chart-icon" /> Radar
               </button>
             </div>
 
@@ -191,7 +266,7 @@ const ExpenseCategories = ({ categories, expenses, onDeleteExpense }) => {
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
-            ) : (
+            ) : chartType === 'bar' ? (
               // Gráfico de barras
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart
@@ -216,6 +291,80 @@ const ExpenseCategories = ({ categories, expenses, onDeleteExpense }) => {
                     ))}
                   </Bar>
                 </BarChart>
+              </ResponsiveContainer>
+            ) : chartType === 'line' ? (
+              // Gráfico de líneas (tendencia de gastos)
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={timeSeriesData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => [`$${value.toFixed(2)}`, 'Monto']} />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="gasto" 
+                    name="Gastos Diarios" 
+                    stroke="#8884d8" 
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                    activeDot={{ r: 6 }} 
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="presupuesto" 
+                    name="Presupuesto Diario" 
+                    stroke="#82ca9d" 
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : chartType === 'area' ? (
+              // Gráfico de área (gastos acumulados)
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={timeSeriesData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => [`$${value.toFixed(2)}`, 'Monto']} />
+                  <Legend />
+                  <Area 
+                    type="monotone" 
+                    dataKey="gasto" 
+                    name="Gastos Diarios" 
+                    stroke="#8884d8" 
+                    fill="#8884d8" 
+                    fillOpacity={0.3} 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="presupuesto" 
+                    name="Presupuesto Diario" 
+                    stroke="#82ca9d" 
+                    fill="#82ca9d"
+                    fillOpacity={0.3}
+                    strokeDasharray="5 5"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              // Gráfico de radar (comparación de categorías)
+              <ResponsiveContainer width="100%" height={300}>
+                <RadarChart outerRadius={90} data={comparisonData}>
+                  <PolarGrid />
+                  <PolarAngleAxis dataKey="category" />
+                  <PolarRadiusAxis angle={30} domain={[0, 'auto']} />
+                  <Radar 
+                    name="Gastos por Categoría" 
+                    dataKey="value" 
+                    stroke="#8884d8" 
+                    fill="#8884d8" 
+                    fillOpacity={0.6} 
+                  />
+                  <Legend />
+                  <Tooltip formatter={(value) => [`$${value.toFixed(2)}`, 'Monto']} />
+                </RadarChart>
               </ResponsiveContainer>
             )}
 

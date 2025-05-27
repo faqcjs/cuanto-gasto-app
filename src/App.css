@@ -622,6 +622,8 @@ body {
 .chart-type-toggle {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px;
   margin-bottom: 20px;
 }
 
@@ -629,24 +631,56 @@ body {
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  padding: 8px 16px;
+  padding: 8px 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.chart-type-btn:first-child {
-  border-radius: 4px 0 0 4px;
+.chart-type-btn .chart-icon {
+  font-size: 1rem;
 }
 
-.chart-type-btn:last-child {
-  border-radius: 0 4px 4px 0;
+.chart-type-btn:hover {
+  background-color: var(--bg-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .chart-type-btn.active {
   background-color: var(--accent-color);
   color: white;
   border-color: var(--accent-color);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos para los gráficos */
+.recharts-wrapper {
+  margin: 0 auto;
+}
+
+.recharts-default-tooltip {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.recharts-tooltip-label {
+  color: var(--text-primary) !important;
+}
+
+.recharts-tooltip-item-list {
+  padding: 0;
+  margin: 5px 0 0 0;
+}
+
+.recharts-tooltip-item {
+  color: var(--text-primary) !important;
 }
 
 /* Estilos para el DebtTracker */
