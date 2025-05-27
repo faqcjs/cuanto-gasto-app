@@ -4,6 +4,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import SettingsIcon from '@mui/icons-material/Settings';
+import PaymentIcon from '@mui/icons-material/Payment';
 
 const Navbar = ({ activeTab, setActiveTab }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -52,6 +53,14 @@ const Navbar = ({ activeTab, setActiveTab }) => {
           >
             <AddCircleOutlineIcon className="navbar-icon" />
             <span className="navbar-text">Agregar Gasto</span>
+          </button>
+          
+          <button 
+            className={`navbar-item ${activeTab === 'deudas' ? 'active' : ''}`}
+            onClick={() => handleTabClick('deudas')}
+          >
+            <PaymentIcon className="navbar-icon" />
+            <span className="navbar-text">Deudas a Pagar</span>
           </button>
           
           <button 

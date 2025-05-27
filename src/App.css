@@ -194,7 +194,7 @@ body {
     padding-top: 50px;
   }
   .main-content{
-    margin 0;
+    margin: 0;
   }
 }
 
@@ -594,6 +594,329 @@ body {
 .main-content {
   width: calc(100% - 60px);
   transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+/* Estilos para la lista de gastos por categoría */
+.filtered-expenses {
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Estilos para las deudas en la lista de categorías */
+.debt-item-in-list {
+  border-left: 4px solid var(--accent-color);
+  background-color: rgba(231, 76, 60, 0.05);
+}
+
+.debt-category-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  background-color: var(--border-color);
+  color: var(--text-secondary);
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 8px;
+}
+
+/* Estilos para los botones de cambio de tipo de gráfico */
+.chart-type-toggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.chart-type-btn {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.chart-type-btn:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.chart-type-btn:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.chart-type-btn.active {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+/* Estilos para el DebtTracker */
+.debt-tracker {
+  width: 100%;
+  max-width: 1000px;
+  padding: 1.5rem;
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+}
+
+.debt-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.debt-total {
+  flex: 1;
+  min-width: 250px;
+  padding: 1.5rem;
+  background-color: var(--background-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.debt-amount {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--accent-color);
+  margin-top: 0.5rem;
+}
+
+.debt-chart {
+  flex: 1;
+  min-width: 250px;
+  max-width: 400px;
+  padding: 1rem;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  margin-right: 1rem;
+}
+
+.color-box {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  margin-right: 5px;
+}
+
+.add-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-bottom: 2rem;
+}
+
+.add-button:hover {
+  background-color: var(--primary-dark);
+}
+
+.form-container {
+  background-color: var(--background-color);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--card-background);
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.submit-button {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-button:hover {
+  background-color: var(--primary-dark);
+}
+
+.cancel-button {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancel-button:hover {
+  background-color: var(--border-color);
+}
+
+.debt-list {
+  margin-top: 2rem;
+}
+
+.debt-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.debt-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: var(--background-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--accent-color);
+  transition: transform 0.2s;
+}
+
+.debt-item:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.debt-item.paid {
+  border-left-color: var(--success-color);
+  opacity: 0.7;
+  background-color: rgba(0, 128, 0, 0.05);
+  position: relative;
+}
+
+.debt-item.paid::after {
+  content: 'PAGADO';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--success-color);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 10px;
+  opacity: 0.8;
+}
+
+.debt-info h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.debt-category {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0;
+}
+
+.debt-amount {
+  font-weight: bold;
+  color: var(--accent-color);
+  margin: 0.5rem 0;
+}
+
+.debt-due-date {
+  font-size: 0.9rem;
+  margin: 0.25rem 0;
+}
+
+.debt-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.paid-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  color: var(--danger-color);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.delete-button:hover {
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+.empty-message {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .debt-summary {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .debt-chart {
+    max-width: 100%;
+  }
+  
+  .debt-items {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Estilos para el mensaje de confirmación */

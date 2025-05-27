@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import Navbar from './Navbar';
 import BudgetSummary from './BudgetSummary';
 import ExpenseCategories from './ExpenseCategories';
 import AddExpense from './AddExpense';
-import BudgetModal from './BudgetModal';
 import ConfirmationModal from './ConfirmationModal';
-import Navbar from './Navbar';
+import BudgetModal from './BudgetModal';
+import DebtTracker from './DebtTracker';
 import Settings from './Settings';
 import { 
   LinearProgress, 
@@ -70,6 +71,30 @@ const Dashboard = () => {
 
   // Función para cargar datos
   const loadData = () => {
+    // Obtener las deudas existentes
+    const savedDebts = localStorage.getItem('debts');
+    let totalDeudas = 0;
+    
+    // Calcular el total de deudas no pagadas
+    if (savedDebts) {
+      try {
+        const deudasArray = JSON.parse(savedDebts);
+        totalDeudas = deudasArray.reduce((sum, debt) => {
+          // Solo sumar al total si la deuda no está marcada como pagada
+          if (!debt.isPaid) {
+            return sum + parseFloat(debt.amount);
+          }
+          return sum;
+        }, 0);
+        console.log('Total de deudas no pagadas:', totalDeudas);
+      } catch (error) {
+        console.error('Error al calcular total de deudas:', error);
+      }
+      
+      // Restaurar las deudas en localStorage
+      localStorage.setItem('debts', savedDebts);
+    }
+    
     const savedData = JSON.parse(localStorage.getItem('gastos')) || [];
     const savedBudget = localStorage.getItem('monthlyBudget') || '0';
     
@@ -79,9 +104,10 @@ const Dashboard = () => {
     // Guardar los gastos completos
     setExpenses(savedData);
     
-    // Calcular total gastado
-    const total = savedData.reduce((acc, item) => acc + Number(item.amount), 0);
-    setTotalSpent(total);
+    // Calcular total gastado (incluyendo deudas)
+    const totalGastos = savedData.reduce((acc, item) => acc + Number(item.amount), 0);
+    const totalConDeudas = totalGastos + totalDeudas;
+    setTotalSpent(totalConDeudas);
 
     // Calcular gastos por categoría
     const categoryTotals = savedData.reduce((acc, item) => {
@@ -91,6 +117,11 @@ const Dashboard = () => {
       acc[item.category] += Number(item.amount);
       return acc;
     }, {});
+    
+    // Agregar la categoría "Deudas fijas" si hay deudas
+    if (totalDeudas > 0) {
+      categoryTotals['Deudas fijas'] = totalDeudas;
+    }
 
     setCategories(Object.entries(categoryTotals).map(([name, value]) => ({
       name,
@@ -188,6 +219,13 @@ const Dashboard = () => {
               onAdd={onAdd}
               setActiveTab={setActiveTab}
             />
+          </div>
+        )}
+        
+        {/* Pestaña de Deudas a Pagar */}
+        {activeTab === 'deudas' && (
+          <div className="dashboard-container" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <DebtTracker />
           </div>
         )}
         
