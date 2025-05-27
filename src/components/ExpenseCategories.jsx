@@ -220,20 +220,6 @@ const ExpenseCategories = ({ categories, expenses, onDeleteExpense }) => {
                 <FaChartBar className="chart-icon" /> Barras
               </button>
               <button 
-                className={`chart-type-btn ${chartType === 'line' ? 'active' : ''}`}
-                onClick={() => setChartType('line')}
-                title="Gráfico de Líneas"
-              >
-                <FaChartLine className="chart-icon" /> Tendencia
-              </button>
-              <button 
-                className={`chart-type-btn ${chartType === 'area' ? 'active' : ''}`}
-                onClick={() => setChartType('area')}
-                title="Gráfico de Área"
-              >
-                <FaChartArea className="chart-icon" /> Área
-              </button>
-              <button 
                 className={`chart-type-btn ${chartType === 'radar' ? 'active' : ''}`}
                 onClick={() => setChartType('radar')}
                 title="Gráfico de Radar"
