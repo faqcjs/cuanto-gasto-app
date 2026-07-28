@@ -5,8 +5,9 @@
   --primary-color: #6366f1;
   --secondary-color: #10b981;
   --accent-color: #f59e0b;
-  --background-color: #0f172a;
-  --surface-color: rgba(30, 41, 59, 0.7);
+  --background-color: #090e1a;
+  --background-gradient: linear-gradient(135deg, #090e1a, #111827);
+  --surface-color: rgba(17, 24, 39, 0.7);
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   
@@ -16,6 +17,8 @@
   
   /* Glassmorphism & Design */
   --border-radius: 16px;
+  --button-radius: 8px;
+  --input-radius: 8px;
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -23,8 +26,8 @@
   --input-bg: rgba(15, 23, 42, 0.6);
   --input-hover-bg: rgba(30, 41, 59, 0.8);
   --nav-bg: rgba(15, 23, 42, 0.8);
-  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-  --glass-backdrop: blur(12px);
+  --glass-border: 1px solid rgba(99, 102, 241, 0.15);
+  --glass-backdrop: blur(16px);
 }
 
 
@@ -46,32 +49,30 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
+  background: var(--background-gradient);
   background-color: var(--background-color);
   color: var(--text-primary);
   font-weight: 300;
+  min-height: 100vh;
 }
 
 .app-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
   min-height: 100vh;
+  width: 100%;
 }
 
 .app-header {
   background-color: var(--nav-bg);
   padding: 1rem;
   box-shadow: var(--shadow-sm);
-  position: fixed;
-  top: 0;
-  left: 60px; /* Espacio para la navbar */
-  right: 0;
-  z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: calc(100% - 60px);
-  transition: left 0.3s ease, width 0.3s ease;
+  width: 100%;
+  backdrop-filter: var(--glass-backdrop);
+  border-bottom: var(--glass-border);
 }
 
 .app-logo {
@@ -86,14 +87,8 @@ body {
 
 .main-content {
   flex: 1;
-  padding: 2rem;
-  padding-top: 7rem;
   display: flex;
-  justify-content: center;
-  align-items: center;
   width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
 }
 
 .content-wrapper {
@@ -111,6 +106,8 @@ body {
   margin-bottom: 2rem;
   width: 100%;
   max-width: 800px;
+  backdrop-filter: var(--glass-backdrop);
+  border: var(--glass-border);
 }
 
 .card h2, .total-spent h2, .budget-progress h2, .category-chart h2, .add-expense-card h2 {
@@ -120,14 +117,10 @@ body {
   font-size: 1.2rem;
 }
 
-/* Dashboard styles */
 .dashboard-wrapper {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  width: 100%;
+  min-height: 100vh;
 }
 
 .dashboard-tabs {
@@ -177,10 +170,13 @@ body {
 }
 
 .dashboard-content {
-  width: 100%;
+  flex: 1;
   display: flex;
-  justify-content: center;
-  margin-left: 60px; /* Espacio para la navbar */
+  flex-direction: column;
+  padding: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 @media (max-width: 768px) {
@@ -253,31 +249,32 @@ body {
 .form-group select {
   width: 100%;
   padding: 0.75rem;
-  border-radius: 8px;
+  border-radius: var(--input-radius);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  background-color: #ffffff; /* Fondo blanco para los inputs */
-  color: #000000; /* Texto negro para mejor visibilidad */
+  background-color: var(--input-bg);
+  color: var(--text-primary);
   transition: var(--transition);
-  box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: var(--primary-color);
-  background-color: #f5f5f5; /* Fondo ligeramente gris al enfocar */
+  border: 1px solid #6366f1;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+  background-color: var(--input-hover-bg);
 }
 
 /* Styling for select options - ensuring options are visible in the dropdown */
 .form-group select option {
-  background-color: #ffffff; /* Fondo blanco para las opciones */
-  color: #000000;           /* Texto negro para las opciones */
+  background-color: #0f172a;
+  color: #f8fafc;
 }
 
 /* Styling for the date input */
 .form-group input[type="date"] {
-  background-color: #ffffff;
-  color: #000000;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
 }
 
 /* Style for the date picker icon in WebKit browsers (Chrome, Edge, Safari) */
@@ -484,9 +481,8 @@ body {
 
 /* Estilos para la navbar desplegable */
 .navbar {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
   height: 100vh;
   width: 60px;
   background-color: var(--nav-bg);
@@ -497,6 +493,9 @@ body {
   display: flex;
   flex-direction: column;
   padding-top: 60px; /* Espacio para el botón toggle */
+  backdrop-filter: var(--glass-backdrop);
+  border-right: var(--glass-border);
+  flex-shrink: 0;
 }
 
 .navbar-open {
@@ -597,8 +596,7 @@ body {
 
 /* Ajustar el contenido principal para dar espacio a la navbar */
 .main-content {
-  width: calc(100% - 60px);
-  transition: margin-left 0.3s ease, width 0.3s ease;
+  width: 100%;
 }
 
 /* Estilos para la lista de gastos por categoría */
@@ -1096,11 +1094,11 @@ body {
 
 /* Estilos para botones */
 .primary-button {
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, var(--primary-color), #818cf8);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: var(--border-radius);
+  border-radius: var(--button-radius);
   cursor: pointer;
   transition: var(--transition);
   font-family: var(--font-heading);
@@ -1354,7 +1352,12 @@ body {
 }
 
 .primary-button:hover {
-  background-color: #1976D2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.primary-button:active {
+  transform: scale(0.98);
 }
 
 .danger-button {
