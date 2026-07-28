@@ -8,11 +8,35 @@ const Settings = () => {
   const [newCategory, setNewCategory] = useState('');
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isIOS, setIsIOS] = useState(false);
+  const [isInstallable, setIsInstallable] = useState(false);
 
   // Cargar categorías personalizadas al montar el componente
   useEffect(() => {
     const savedCategories = JSON.parse(localStorage.getItem('customCategories')) || [];
     setCustomCategories(savedCategories);
+
+    // PWA Install Logic
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
+    const isStandalone = ('standalone' in window.navigator) && window.navigator.standalone;
+    
+    if (isIosDevice && !isStandalone) {
+      setIsIOS(true);
+    }
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
   }, []);
 
   // Guardar categorías personalizadas cuando cambian
@@ -53,10 +77,58 @@ const Settings = () => {
     setCategoryToDelete(null);
   };
 
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+    }
+    setDeferredPrompt(null);
+    setIsInstallable(false);
+  };
+
   return (
     <div className="settings-container">
       <h2 className="section-title">Ajustes</h2>
       
+      {(isInstallable || isIOS) && (
+        <div className="settings-section glass-card" style={{ marginBottom: '20px', padding: '20px', borderRadius: '15px', background: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+          <h3>Instalar Aplicación</h3>
+          {isInstallable && (
+            <div>
+              <p className="settings-description" style={{ marginBottom: '15px' }}>
+                Instala Cuánto Gasto en tu dispositivo para un acceso rápido y uso sin conexión.
+              </p>
+              <button 
+                onClick={handleInstallClick}
+                style={{ 
+                  background: 'linear-gradient(135deg, #6e8efb, #a777e3)', 
+                  color: 'white', 
+                  border: 'none', 
+                  padding: '10px 20px', 
+                  borderRadius: '10px', 
+                  cursor: 'pointer', 
+                  fontWeight: '600',
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                Instalar Aplicación en Celular / PC
+              </button>
+            </div>
+          )}
+          {!isInstallable && isIOS && (
+            <p className="settings-description" style={{ marginBottom: '0', fontSize: '0.95rem' }}>
+              Para instalar en tu iPhone: presiona Compartir 📤 y luego <strong>Agregar a pantalla de inicio ➕</strong>.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="settings-section">
         <h3>Categorías personalizadas</h3>
         <p className="settings-description">
