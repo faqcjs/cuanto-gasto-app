@@ -5,6 +5,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PaymentIcon from '@mui/icons-material/Payment';
+import BarChartIcon from '@mui/icons-material/BarChart';
 
 const Navbar = ({ activeTab, setActiveTab }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -61,6 +62,14 @@ const Navbar = ({ activeTab, setActiveTab }) => {
           >
             <PaymentIcon className="navbar-icon" />
             <span className="navbar-text">Deudas a Pagar</span>
+          </button>
+          
+          <button 
+            className={`navbar-item ${activeTab === 'analiticas' ? 'active' : ''}`}
+            onClick={() => handleTabClick('analiticas')}
+          >
+            <BarChartIcon className="navbar-icon" />
+            <span className="navbar-text">Estadísticas</span>
           </button>
           
           <button 

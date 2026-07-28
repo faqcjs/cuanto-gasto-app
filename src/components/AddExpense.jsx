@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import { useGlobalContext } from '../context/GlobalContext';
 
 const CATEGORY_OPTIONS = [
   { value: 'Comida', label: 'Comida' },
@@ -16,7 +17,17 @@ const paymentMethods = [
   { value: 'transferencia', label: 'Transferencia' }
 ];
 
-const AddExpense = ({ expense, setExpense, onAdd, setActiveTab }) => {
+const AddExpense = ({ setActiveTab }) => {
+  const { addExpense } = useGlobalContext();
+  const [expense, setExpense] = useState({
+    amount: '',
+    description: '',
+    category: 'Comida',
+    paymentMethod: 'efectivo',
+    date: format(new Date(), 'yyyy-MM-dd'),
+    tags: ''
+  });
+  
   const [allCategories, setAllCategories] = useState([...CATEGORY_OPTIONS]);
   
   // Cargar categorías personalizadas
@@ -29,6 +40,7 @@ const AddExpense = ({ expense, setExpense, onAdd, setActiveTab }) => {
     
     setAllCategories([...CATEGORY_OPTIONS, ...customCategoryOptions]);
   }, []);
+
   return (
     <div className="add-expense-card-full">
       <h2>Agregar gasto</h2>
@@ -38,12 +50,30 @@ const AddExpense = ({ expense, setExpense, onAdd, setActiveTab }) => {
           alert('Por favor ingrese un monto válido');
           return;
         }
-        onAdd(expense);
-        setExpense({
+        
+        // Parse tags
+        const parsedTags = expense.tags 
+          ? expense.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== '')
+          : [];
+        
+        const newExpense = {
           ...expense,
-          amount: ''
+          id: Date.now(),
+          amount: Number(expense.amount),
+          tags: parsedTags
+        };
+        
+        addExpense(newExpense);
+        
+        setExpense({
+          amount: '',
+          description: '',
+          category: 'Comida',
+          paymentMethod: 'efectivo',
+          date: format(new Date(), 'yyyy-MM-dd'),
+          tags: ''
         });
-        // Cambiar a la pestaña de resumen después de agregar un gasto
+        
         setActiveTab('resumen');
       }}>
         <div className="form-group">
@@ -66,6 +96,17 @@ const AddExpense = ({ expense, setExpense, onAdd, setActiveTab }) => {
             onChange={(e) => setExpense({ ...expense, description: e.target.value })}
             placeholder="Ej: Compra en supermercado"
             required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="tags">Etiquetas (separadas por coma)</label>
+          <input
+            type="text"
+            id="tags"
+            value={expense.tags || ''}
+            onChange={(e) => setExpense({ ...expense, tags: e.target.value })}
+            placeholder="Ej: mercado, semanal"
           />
         </div>
 

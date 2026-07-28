@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { format } from 'date-fns';
 import Navbar from './Navbar';
 import BudgetSummary from './BudgetSummary';
 import ExpenseCategories from './ExpenseCategories';
@@ -8,117 +7,36 @@ import ConfirmationModal from './ConfirmationModal';
 import BudgetModal from './BudgetModal';
 import DebtTracker from './DebtTracker';
 import Settings from './Settings';
-import { 
-  LinearProgress, 
-  TextField, 
-  Select, 
-  MenuItem, 
-  FormControl, 
-  InputLabel, 
-  Button, 
-  Box, 
-  Typography 
-} from '@mui/material';
-import es from 'date-fns/locale/es';
-
-const COLORS = ['#2196F3', '#4CAF50', '#FF9800', '#9C27B0', '#00BCD4'];
-
-const CATEGORY_OPTIONS = [
-  { value: 'Comida', label: 'Comida' },
-  { value: 'Transporte', label: 'Transporte' },
-  { value: 'Ocio', label: 'Ocio' },
-  { value: 'Educación', label: 'Educación' },
-  { value: 'Salud', label: 'Salud' },
-  { value: 'Otros', label: 'Otros' }
-];
+import Analytics from './Analytics';
+import { useGlobalContext } from '../context/GlobalContext';
 
 const Dashboard = () => {
+  const { gastos, monthlyBudget, setMonthlyBudget, debts, deleteExpense } = useGlobalContext();
+  
   const [totalSpent, setTotalSpent] = useState(0);
-  const [monthlyBudget, setMonthlyBudget] = useState(0);
-  const [tempBudget, setTempBudget] = useState(0);
   const [categories, setCategories] = useState([]);
-  const [expenses, setExpenses] = useState([]);
   const [activeTab, setActiveTab] = useState('resumen');
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [expense, setExpense] = useState({
-    amount: '',
-    description: '',
-    category: 'Comida',
-    paymentMethod: 'efectivo',
-    date: format(new Date(), 'yyyy-MM-dd')
-  });
-  const [paymentMethods, setPaymentMethods] = useState([
-    { value: 'efectivo', label: 'Efectivo' },
-    { value: 'tarjeta', label: 'Tarjeta' },
-    { value: 'transferencia', label: 'Transferencia' }
-  ]);
+  const [tempBudget, setTempBudget] = useState(monthlyBudget);
 
-  // Función para eliminar el presupuesto
-  const deleteBudget = () => {
-    localStorage.removeItem('monthlyBudget');
-    setMonthlyBudget(0);
-    setTempBudget(0);
-  };
-  
-  // Función para eliminar un gasto individual
-  const deleteExpense = (expenseId) => {
-    const updatedExpenses = expenses.filter(expense => expense.id !== expenseId);
-    localStorage.setItem('gastos', JSON.stringify(updatedExpenses));
-    setExpenses(updatedExpenses);
-    loadData(); // Recargar los datos para actualizar las categorías y totales
-  };
+  useEffect(() => {
+    setTempBudget(monthlyBudget);
+  }, [monthlyBudget]);
 
-  // Función para cargar datos
-  const loadData = () => {
-    // Obtener las deudas existentes
-    const savedDebts = localStorage.getItem('debts');
-    let totalDeudas = 0;
+  useEffect(() => {
+    // Note: old code checked debt.isPaid, let's use both paid and isPaid just in case
+    const totalDeudas = debts.reduce((sum, debt) => (!(debt.paid || debt.isPaid) ? sum + Number(debt.amount) : sum), 0);
+    const totalGastos = gastos.reduce((acc, item) => acc + Number(item.amount), 0);
     
-    // Calcular el total de deudas no pagadas
-    if (savedDebts) {
-      try {
-        const deudasArray = JSON.parse(savedDebts);
-        totalDeudas = deudasArray.reduce((sum, debt) => {
-          // Solo sumar al total si la deuda no está marcada como pagada
-          if (!debt.isPaid) {
-            return sum + parseFloat(debt.amount);
-          }
-          return sum;
-        }, 0);
-        console.log('Total de deudas no pagadas:', totalDeudas);
-      } catch (error) {
-        console.error('Error al calcular total de deudas:', error);
-      }
-      
-      // Restaurar las deudas en localStorage
-      localStorage.setItem('debts', savedDebts);
-    }
-    
-    const savedData = JSON.parse(localStorage.getItem('gastos')) || [];
-    const savedBudget = localStorage.getItem('monthlyBudget') || '0';
-    
-    setMonthlyBudget(Number(savedBudget));
-    setTempBudget(Number(savedBudget));
-    
-    // Guardar los gastos completos
-    setExpenses(savedData);
-    
-    // Calcular total gastado (incluyendo deudas)
-    const totalGastos = savedData.reduce((acc, item) => acc + Number(item.amount), 0);
-    const totalConDeudas = totalGastos + totalDeudas;
-    setTotalSpent(totalConDeudas);
+    setTotalSpent(totalGastos + totalDeudas);
 
-    // Calcular gastos por categoría
-    const categoryTotals = savedData.reduce((acc, item) => {
-      if (!acc[item.category]) {
-        acc[item.category] = 0;
-      }
+    const categoryTotals = gastos.reduce((acc, item) => {
+      if (!acc[item.category]) acc[item.category] = 0;
       acc[item.category] += Number(item.amount);
       return acc;
     }, {});
-    
-    // Agregar la categoría "Deudas fijas" si hay deudas
+
     if (totalDeudas > 0) {
       categoryTotals['Deudas fijas'] = totalDeudas;
     }
@@ -127,31 +45,18 @@ const Dashboard = () => {
       name,
       value
     })));
+  }, [gastos, debts]);
+
+  const deleteBudget = () => {
+    setMonthlyBudget(0);
+    setTempBudget(0);
   };
-
-  // Función para agregar un nuevo gasto
-  const onAdd = (newExpense) => {
-    const savedData = JSON.parse(localStorage.getItem('gastos')) || [];
-    const updatedExpenses = [...savedData, { ...newExpense, id: Date.now(), amount: Number(newExpense.amount) }];
-    localStorage.setItem('gastos', JSON.stringify(updatedExpenses));
-    setExpenses(updatedExpenses); // Actualizar el estado de expenses directamente
-    loadData();
-  };
-
-  useEffect(() => {
-    // Cargar datos al iniciar
-    loadData();
-  }, []);
-
 
   return (
     <div className="dashboard-wrapper">
-      {/* Navbar desplegable */}
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* Contenido de las pestañas */}
       <div className="dashboard-content">
-        {/* Pestaña de Resumen */}
         {activeTab === 'resumen' && (
           <div className="dashboard-container" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
             {categories.length === 0 && monthlyBudget === 0 ? (
@@ -180,7 +85,7 @@ const Dashboard = () => {
                 />
                 <ExpenseCategories 
                   categories={categories} 
-                  expenses={expenses} 
+                  expenses={gastos} 
                   onDeleteExpense={deleteExpense} 
                 />
               </div>
@@ -188,7 +93,6 @@ const Dashboard = () => {
           </div>
         )}
         
-        {/* Modal de Presupuesto */}
         <BudgetModal 
           isOpen={isBudgetModalOpen}
           onClose={() => setIsBudgetModalOpen(false)}
@@ -197,7 +101,6 @@ const Dashboard = () => {
           setMonthlyBudget={setMonthlyBudget}
         />
         
-        {/* Modal de Confirmación para eliminar presupuesto */}
         <ConfirmationModal 
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
@@ -208,28 +111,24 @@ const Dashboard = () => {
           cancelButtonText="Cancelar"
         />
 
-
-
-        {/* Pestaña de Agregar Gasto */}
         {activeTab === 'agregar' && (
           <div className="dashboard-container" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-            <AddExpense 
-              expense={expense}
-              setExpense={setExpense}
-              onAdd={onAdd}
-              setActiveTab={setActiveTab}
-            />
+            <AddExpense setActiveTab={setActiveTab} />
           </div>
         )}
         
-        {/* Pestaña de Deudas a Pagar */}
         {activeTab === 'deudas' && (
           <div className="dashboard-container" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
             <DebtTracker />
           </div>
         )}
         
-        {/* Pestaña de Ajustes */}
+        {activeTab === 'analiticas' && (
+          <div className="dashboard-container" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <Analytics />
+          </div>
+        )}
+        
         {activeTab === 'ajustes' && (
           <div className="dashboard-container" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
             <Settings />

@@ -1,30 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { PieChart } from 'react-minimal-pie-chart';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import { useGlobalContext } from '../context/GlobalContext';
 
 const DebtTracker = () => {
-  // Inicializar el estado con las deudas guardadas en localStorage
-  const [debts, setDebts] = useState(() => {
-    try {
-      const savedDebts = localStorage.getItem('debts');
-      return savedDebts ? JSON.parse(savedDebts) : [];
-    } catch (error) {
-      console.error('Error al inicializar estado de deudas:', error);
-      return [];
-    }
-  });
+  const { debts, addDebt, deleteDebt, toggleDebtPaid } = useGlobalContext();
+  
   const [newDebt, setNewDebt] = useState({
     name: '',
     amount: '',
     dueDate: '',
     category: 'Servicios',
-    isPaid: false
+    paid: false
   });
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [totalDebt, setTotalDebt] = useState(0);
 
-  // Categorías predefinidas para deudas
   const debtCategories = [
     'Servicios',
     'Préstamos',
@@ -36,7 +27,6 @@ const DebtTracker = () => {
     'Otros'
   ];
 
-  // Colores para el gráfico
   const categoryColors = {
     'Servicios': '#FF6384',
     'Préstamos': '#36A2EB',
@@ -48,56 +38,6 @@ const DebtTracker = () => {
     'Otros': '#7BC043'
   };
 
-  // Cargar deudas desde localStorage
-  useEffect(() => {
-    try {
-      const savedDebts = localStorage.getItem('debts');
-      if (savedDebts) {
-        const parsedDebts = JSON.parse(savedDebts);
-        console.log('Deudas cargadas desde localStorage:', parsedDebts);
-        setDebts(parsedDebts);
-      } else {
-        console.log('No se encontraron deudas guardadas en localStorage');
-      }
-    } catch (error) {
-      console.error('Error al cargar deudas desde localStorage:', error);
-    }
-    
-    // Esta función se ejecutará cuando el componente se desmonte
-    return () => {
-      // Asegurarse de que las deudas actuales se guarden antes de desmontar
-      try {
-        const currentDebts = localStorage.getItem('debts');
-        if (currentDebts) {
-          console.log('Preservando deudas antes de desmontar componente:', JSON.parse(currentDebts));
-        }
-      } catch (error) {
-        console.error('Error al preservar deudas:', error);
-      }
-    };
-  }, []);
-
-  // Actualizar localStorage cuando cambian las deudas
-  useEffect(() => {
-    try {
-      console.log('Guardando deudas en localStorage:', debts);
-      localStorage.setItem('debts', JSON.stringify(debts));
-      
-      // Calcular deuda total (solo deudas no pagadas)
-      const total = debts.reduce((sum, debt) => {
-        // Solo sumar al total si la deuda no está marcada como pagada
-        if (!debt.isPaid) {
-          return sum + parseFloat(debt.amount);
-        }
-        return sum;
-      }, 0);
-      setTotalDebt(total);
-    } catch (error) {
-      console.error('Error al guardar deudas en localStorage:', error);
-    }
-  }, [debts]);
-
-  // Manejar cambios en el formulario
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewDebt({
@@ -106,78 +46,39 @@ const DebtTracker = () => {
     });
   };
 
-  // Agregar nueva deuda
   const handleAddDebt = (e) => {
     e.preventDefault();
-    
     if (!newDebt.name || !newDebt.amount || !newDebt.dueDate) {
       alert('Por favor completa todos los campos');
       return;
     }
-
-    try {
-      const debtToAdd = {
-        ...newDebt,
-        id: Date.now(),
-        amount: parseFloat(newDebt.amount)
-      };
-
-      console.log('Agregando nueva deuda:', debtToAdd);
-      const updatedDebts = [...debts, debtToAdd];
-      setDebts(updatedDebts);
-      
-      // Guardar inmediatamente en localStorage
-      localStorage.setItem('debts', JSON.stringify(updatedDebts));
-      
-      setNewDebt({
-        name: '',
-        amount: '',
-        dueDate: '',
-        category: 'Servicios',
-        isPaid: false
-      });
-      setIsFormVisible(false);
-    } catch (error) {
-      console.error('Error al agregar deuda:', error);
-      alert('Hubo un error al guardar la deuda. Por favor intenta nuevamente.');
-    }
+    const debtToAdd = {
+      ...newDebt,
+      id: Date.now(),
+      amount: parseFloat(newDebt.amount)
+    };
+    addDebt(debtToAdd);
+    setNewDebt({
+      name: '',
+      amount: '',
+      dueDate: '',
+      category: 'Servicios',
+      paid: false
+    });
+    setIsFormVisible(false);
   };
 
-  // Eliminar deuda
-  const handleDeleteDebt = (id) => {
-    try {
-      const updatedDebts = debts.filter(debt => debt.id !== id);
-      console.log('Eliminando deuda, nueva lista:', updatedDebts);
-      setDebts(updatedDebts);
-      
-      // Guardar inmediatamente en localStorage
-      localStorage.setItem('debts', JSON.stringify(updatedDebts));
-    } catch (error) {
-      console.error('Error al eliminar deuda:', error);
+  const totalDebt = debts.reduce((sum, debt) => {
+    if (!debt.paid && !debt.isPaid) {
+      return sum + parseFloat(debt.amount);
     }
-  };
+    return sum;
+  }, 0);
 
-  // Marcar deuda como pagada
-  const handleTogglePaid = (id) => {
-    try {
-      const updatedDebts = debts.map(debt => 
-        debt.id === id ? { ...debt, isPaid: !debt.isPaid } : debt
-      );
-      console.log('Actualizando estado de deuda, nueva lista:', updatedDebts);
-      setDebts(updatedDebts);
-      
-      // Guardar inmediatamente en localStorage
-      localStorage.setItem('debts', JSON.stringify(updatedDebts));
-    } catch (error) {
-      console.error('Error al actualizar estado de deuda:', error);
-    }
-  };
-
-  // Preparar datos para el gráfico (solo deudas no pagadas)
   const chartData = debtCategories.map(category => {
     const categoryTotal = debts
-      .filter(debt => debt.category === category && !debt.isPaid) // Solo incluir deudas no pagadas
-      .reduce((sum, debt) => sum + debt.amount, 0);
+      .filter(debt => debt.category === category && !debt.paid && !debt.isPaid)
+      .reduce((sum, debt) => sum + Number(debt.amount), 0);
     
     return {
       title: category,
@@ -246,7 +147,6 @@ const DebtTracker = () => {
                 required
               />
             </div>
-
             <div className="form-group">
               <label htmlFor="amount">Monto:</label>
               <input
@@ -261,7 +161,6 @@ const DebtTracker = () => {
                 required
               />
             </div>
-
             <div className="form-group">
               <label htmlFor="dueDate">Fecha de vencimiento:</label>
               <input
@@ -273,7 +172,6 @@ const DebtTracker = () => {
                 required
               />
             </div>
-
             <div className="form-group">
               <label htmlFor="category">Categoría:</label>
               <select
@@ -290,7 +188,6 @@ const DebtTracker = () => {
                 ))}
               </select>
             </div>
-
             <div className="form-actions">
               <button type="submit" className="submit-button">Guardar</button>
               <button 
@@ -312,25 +209,25 @@ const DebtTracker = () => {
         ) : (
           <div className="debt-items">
             {debts.map(debt => (
-              <div key={debt.id} className={`debt-item ${debt.isPaid ? 'paid' : ''}`}>
+              <div key={debt.id} className={`debt-item ${debt.paid || debt.isPaid ? 'paid' : ''}`}>
                 <div className="debt-info">
                   <h4>{debt.name}</h4>
                   <p className="debt-category">{debt.category}</p>
-                  <p className="debt-amount">${debt.amount.toFixed(2)}</p>
+                  <p className="debt-amount">${Number(debt.amount).toFixed(2)}</p>
                   <p className="debt-due-date">Vence: {new Date(debt.dueDate).toLocaleDateString()}</p>
                 </div>
                 <div className="debt-actions">
                   <label className="paid-checkbox">
                     <input
                       type="checkbox"
-                      checked={debt.isPaid}
-                      onChange={() => handleTogglePaid(debt.id)}
+                      checked={debt.paid || debt.isPaid || false}
+                      onChange={() => toggleDebtPaid(debt.id)}
                     />
                     Pagado
                   </label>
                   <button 
                     className="delete-button"
-                    onClick={() => handleDeleteDebt(debt.id)}
+                    onClick={() => deleteDebt(debt.id)}
                   >
                     <DeleteIcon />
                   </button>
