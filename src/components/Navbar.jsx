@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   FiPieChart, 
-  FiPlusCircle, 
+  FiList, 
   FiCreditCard, 
   FiBarChart2, 
   FiSettings 
@@ -11,7 +11,7 @@ import {
 const Navbar = () => {
   const navItems = [
     { to: '/', label: 'Resumen', icon: <FiPieChart className="text-xl" /> },
-    { to: '/agregar', label: 'Agregar', icon: <FiPlusCircle className="text-xl" /> },
+    { to: '/gastos', label: 'Gastos', icon: <FiList className="text-xl" /> },
     { to: '/deudas', label: 'Deudas', icon: <FiCreditCard className="text-xl" /> },
     { to: '/analiticas', label: 'Estadísticas', icon: <FiBarChart2 className="text-xl" /> },
     { to: '/ajustes', label: 'Ajustes', icon: <FiSettings className="text-xl" /> },
