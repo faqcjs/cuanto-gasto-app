@@ -57,9 +57,17 @@ const BudgetSummary = ({
             </div>
           </div>
 
-          <div className="flex justify-between text-sm text-slate-300 font-medium pt-1">
-            <span className="text-slate-400">Gastado: <strong className="text-slate-100">${totalSpent.toFixed(2)}</strong></span>
-            <span className="text-slate-400">Presupuesto: <strong className="text-indigo-300">${monthlyBudget.toFixed(2)}</strong></span>
+          <div className="flex items-center justify-between text-xs sm:text-sm text-slate-300 font-medium pt-1">
+            <span className="text-slate-400 flex items-center gap-1.5">
+              <FiTrendingDown className="text-rose-400 text-base shrink-0" title="Gastado" />
+              <span className="hidden sm:inline">Gastado:</span>
+              <strong className="text-slate-100">${totalSpent.toFixed(2)}</strong>
+            </span>
+            <span className="text-slate-400 flex items-center gap-1.5">
+              <FiSliders className="text-indigo-400 text-base shrink-0" title="Presupuesto" />
+              <span className="hidden sm:inline">Presupuesto:</span>
+              <strong className="text-indigo-300">${monthlyBudget.toFixed(2)}</strong>
+            </span>
           </div>
         </div>
       ) : (

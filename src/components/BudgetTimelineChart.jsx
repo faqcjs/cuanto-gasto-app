@@ -168,7 +168,10 @@ const BudgetTimelineChart = ({ gastos = [], incomes = [], monthlyBudget = 0 }) =
             <FiTrendingDown className="text-base sm:text-lg" />
           </div>
           <div className="min-w-0">
-            <span className="text-[10px] sm:text-[11px] uppercase font-semibold text-slate-400 block truncate">Gastos del Período</span>
+            <span className="text-[10px] sm:text-[11px] uppercase font-semibold text-slate-400 block truncate">
+              <span className="hidden sm:inline">Gastos del Período</span>
+              <span className="sm:hidden">Gastos</span>
+            </span>
             <span className="text-sm sm:text-lg font-extrabold text-rose-400 truncate block">
               ${totalGastosPeriodo.toFixed(2)}
             </span>
@@ -180,7 +183,10 @@ const BudgetTimelineChart = ({ gastos = [], incomes = [], monthlyBudget = 0 }) =
             <FiTrendingUp className="text-base sm:text-lg" />
           </div>
           <div className="min-w-0">
-            <span className="text-[10px] sm:text-[11px] uppercase font-semibold text-slate-400 block truncate">Ingresos Extra</span>
+            <span className="text-[10px] sm:text-[11px] uppercase font-semibold text-slate-400 block truncate">
+              <span className="hidden sm:inline">Ingresos Extra</span>
+              <span className="sm:hidden">Ingresos</span>
+            </span>
             <span className="text-sm sm:text-lg font-extrabold text-emerald-400 truncate block">
               ${totalIngresosPeriodo.toFixed(2)}
             </span>
