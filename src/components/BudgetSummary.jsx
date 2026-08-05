@@ -1,4 +1,5 @@
 import React from 'react';
+import { FiTrash2, FiDollarSign } from 'react-icons/fi';
 
 const BudgetSummary = ({ totalSpent, monthlyBudget, onBudgetClick, onDeleteBudget }) => {
   const hasBudget = monthlyBudget > 0;
@@ -7,7 +8,7 @@ const BudgetSummary = ({ totalSpent, monthlyBudget, onBudgetClick, onDeleteBudge
   const isOverBudget = remaining < 0;
 
   return (
-    <div className="w-full glass-card rounded-2xl p-6 border border-slate-800 shadow-xl space-y-5">
+    <div className="w-full glass-card rounded-2xl p-4 sm:p-6 border border-slate-800 shadow-xl space-y-5">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-slate-100 tracking-wide">Resumen de Presupuesto</h2>
         {hasBudget && (
@@ -71,20 +72,24 @@ const BudgetSummary = ({ totalSpent, monthlyBudget, onBudgetClick, onDeleteBudge
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-3 pt-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-2 w-full">
         <button
-          className="flex-1 min-w-[160px] px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/25 transition-all duration-200 cursor-pointer"
+          className="w-full sm:flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/25 transition-all duration-200 cursor-pointer min-w-0"
           onClick={onBudgetClick}
         >
-          {hasBudget ? 'Modificar presupuesto' : 'Establecer presupuesto'}
+          <FiDollarSign className="text-lg text-emerald-300 shrink-0" />
+          <span className="truncate">{hasBudget ? 'Modificar Presupuesto' : 'Ingresar Presupuesto'}</span>
         </button>
 
         {hasBudget && (
           <button
-            className="px-4 py-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 text-sm font-semibold transition-all duration-200 cursor-pointer"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-sm font-semibold transition-all duration-200 cursor-pointer shrink-0"
             onClick={onDeleteBudget}
+            title="Eliminar Presupuesto"
+            aria-label="Eliminar Presupuesto"
           >
-            Eliminar presupuesto
+            <FiTrash2 className="text-base text-rose-400" />
+            <span className="sm:hidden">Eliminar Presupuesto</span>
           </button>
         )}
       </div>
