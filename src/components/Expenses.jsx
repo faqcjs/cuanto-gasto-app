@@ -8,7 +8,8 @@ import {
   FiCreditCard, 
   FiFilter,
   FiShoppingBag,
-  FiRefreshCw
+  FiRefreshCw,
+  FiAlertTriangle
 } from 'react-icons/fi';
 import { format } from 'date-fns';
 import { useGlobalContext } from '../context/GlobalContext';
@@ -17,7 +18,7 @@ import EditExpenseModal from './EditExpenseModal';
 import ConfirmationModal from './ConfirmationModal';
 
 const Expenses = () => {
-  const { gastos, addMultipleExpenses, updateExpense, deleteExpense, DEFAULT_CATEGORIES } = useGlobalContext();
+  const { gastos, addMultipleExpenses, updateExpense, deleteExpense, clearAllData, DEFAULT_CATEGORIES } = useGlobalContext();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todas');
@@ -26,6 +27,12 @@ const Expenses = () => {
   
   const [editingExpense, setEditingExpense] = useState(null);
   const [deletingExpense, setDeletingExpense] = useState(null);
+  const [showResetModal, setShowResetModal] = useState(false);
+
+  const handleReset = () => {
+    clearAllData();
+    setShowResetModal(false);
+  };
 
   const handleQuickMPSync = async () => {
     const token = getMPToken();
@@ -125,6 +132,15 @@ const Expenses = () => {
             >
               <FiRefreshCw className={`text-sm ${syncingMP ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Sincronizar MP</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowResetModal(true)}
+              className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-all cursor-pointer active:scale-95"
+              title="Resetear base de datos"
+            >
+              <FiAlertTriangle className="text-sm" />
             </button>
 
             <div className="bg-slate-900/60 p-2.5 sm:p-3 rounded-xl border border-slate-800 flex items-center gap-2">
@@ -313,6 +329,17 @@ const Expenses = () => {
         title="Borrar Gasto"
         message={`¿Estás seguro de eliminar el gasto "${deletingExpense?.description || 'sin descripción'}" por $${deletingExpense?.amount?.toFixed(2)}?`}
         confirmButtonText="Borrar"
+        cancelButtonText="Cancelar"
+      />
+
+      {/* Reset Database Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showResetModal}
+        onClose={() => setShowResetModal(false)}
+        onConfirm={handleReset}
+        title="Resetear base de datos"
+        message="¿Estás seguro? Se van a eliminar TODOS los gastos, ingresos, deudas y configuraciones. Esta acción no se puede deshacer."
+        confirmButtonText="Sí, resetear todo"
         cancelButtonText="Cancelar"
       />
     </div>
