@@ -123,41 +123,36 @@ export const fetchMPPayments = async (token) => {
     throw new Error('No se ha configurado ningún Access Token de Mercado Pago');
   }
 
-  // Mercado Pago payments search endpoint
-  const url = `https://api.mercadopago.com/v1/payments/search?sort=date_created&criteria=desc&limit=50`;
-
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      }
+    // Call our Vercel serverless proxy to avoid CORS restrictions
+    const response = await fetch('/api/mp-sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: accessToken }),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error('Token de Mercado Pago inválido o expirado');
-      }
-      const errJson = await response.json().catch(() => ({}));
-      throw new Error(errJson.message || `Error ${response.status} al consultar la API de Mercado Pago`);
+      throw new Error(data.error || `Error ${response.status} al sincronizar`);
     }
 
-    const data = await response.json();
     const results = data.results || [];
 
-    // Filter approved payments (gastos/outcoming payments or approved transactions)
-    const approvedPayments = results.filter(p => p.status === 'approved' && p.transaction_amount > 0);
+    // Keep only approved outgoing payments with a positive amount
+    const approvedPayments = results.filter(
+      (p) => p.status === 'approved' && p.transaction_amount > 0
+    );
     const parsedExpenses = approvedPayments.map(parseMPPaymentToExpense);
 
     return {
       success: true,
       count: parsedExpenses.length,
       expenses: parsedExpenses,
-      rawCount: results.length
+      rawCount: results.length,
     };
   } catch (error) {
-    console.error('Mercado Pago API Sync Error:', error);
+    console.error('Mercado Pago Sync Error:', error);
     throw error;
   }
 };
