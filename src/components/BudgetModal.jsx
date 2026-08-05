@@ -9,13 +9,12 @@ const BudgetModal = ({ isOpen, onClose, tempBudget, setTempBudget, setMonthlyBud
     if (isOpen) {
       setShouldRender(true);
       setIsClosing(false);
-      // Si hay un presupuesto establecido, mostrar su valor, de lo contrario dejar vacío
       setInputValue(tempBudget > 0 ? tempBudget.toString() : '');
     } else if (shouldRender) {
       setIsClosing(true);
       const timer = setTimeout(() => {
         setShouldRender(false);
-      }, 300); // Duración de la animación
+      }, 200);
       return () => clearTimeout(timer);
     }
   }, [isOpen, tempBudget]);
@@ -30,39 +29,45 @@ const BudgetModal = ({ isOpen, onClose, tempBudget, setTempBudget, setMonthlyBud
     setIsClosing(true);
     setTimeout(() => {
       onClose();
-    }, 280); // Duración de la animación
+    }, 200);
   };
 
   return (
-    <div className={`modal-overlay ${isClosing ? 'modal-fadeout' : ''}`}>
-      <div className={`modal-content ${isClosing ? 'modal-slideout' : ''}`}>
-        <h2>Establecer presupuesto</h2>
-        <div className="form-group">
-          <label htmlFor="budget-modal">Ingrese su presupuesto mensual</label>
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}>
+      <div className="w-full max-w-md glass-card rounded-2xl p-6 border border-indigo-500/20 shadow-2xl space-y-5">
+        <h2 className="text-xl font-bold text-slate-100">Establecer Presupuesto</h2>
+        <div className="space-y-1.5">
+          <label htmlFor="budget-modal" className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Ingrese su presupuesto mensual ($)
+          </label>
           <input 
             type="number" 
             id="budget-modal" 
             value={inputValue} 
-            onChange={(e) => {
-              setInputValue(e.target.value);
-            }}
-            placeholder="Ingrese monto"
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="Ej: 150000"
             min="0"
             step="100"
             autoFocus
+            className="w-full px-4 py-3 rounded-xl glass-input text-lg font-semibold text-indigo-300"
           />
         </div>
-        <div className="modal-actions">
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
           <button 
-            className="secondary-button" 
+            type="button"
+            className="px-4 py-2.5 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800 text-sm font-medium transition-colors cursor-pointer" 
             onClick={() => {
               setIsClosing(true);
-              setTimeout(onClose, 280);
+              setTimeout(onClose, 200);
             }}
           >
             Cancelar
           </button>
-          <button className="primary-button" onClick={handleSave}>
+          <button 
+            type="button"
+            className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all duration-200 cursor-pointer"
+            onClick={handleSave}
+          >
             Guardar
           </button>
         </div>

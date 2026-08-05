@@ -1,5 +1,15 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 
+export const DEFAULT_CATEGORIES = [
+  { id: 'Comida', name: 'Comida', color: '#FF6B6B', icon: 'Restaurant' },
+  { id: 'Transporte', name: 'Transporte', color: '#4D96FF', icon: 'DirectionsBus' },
+  { id: 'Ocio', name: 'Ocio', color: '#FFD93D', icon: 'SportsEsports' },
+  { id: 'Educación', name: 'Educación', color: '#6BCB77', icon: 'School' },
+  { id: 'Salud', name: 'Salud', color: '#9B51E0', icon: 'LocalHospital' },
+  { id: 'Servicios', name: 'Servicios', color: '#FF9F40', icon: 'Receipt' },
+  { id: 'Otros', name: 'Otros', color: '#A0AEC0', icon: 'MoreHoriz' },
+];
+
 export const GlobalContext = createContext();
 
 export const GlobalProvider = ({ children }) => {
@@ -8,7 +18,7 @@ export const GlobalProvider = ({ children }) => {
       const item = localStorage.getItem('gastos');
       return item ? JSON.parse(item) : [];
     } catch (error) {
-      console.error(error);
+      console.error('Error reading gastos from storage:', error);
       return [];
     }
   });
@@ -18,7 +28,7 @@ export const GlobalProvider = ({ children }) => {
       const item = localStorage.getItem('monthlyBudget');
       return item ? Number(item) : 0;
     } catch (error) {
-      console.error(error);
+      console.error('Error reading monthlyBudget from storage:', error);
       return 0;
     }
   });
@@ -26,9 +36,15 @@ export const GlobalProvider = ({ children }) => {
   const [debts, setDebts] = useState(() => {
     try {
       const item = localStorage.getItem('debts');
-      return item ? JSON.parse(item) : [];
+      if (!item) return [];
+      const parsed = JSON.parse(item);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map(d => ({
+        ...d,
+        paid: Boolean(d.paid || d.isPaid || false)
+      }));
     } catch (error) {
-      console.error(error);
+      console.error('Error reading debts from storage:', error);
       return [];
     }
   });
@@ -37,8 +53,7 @@ export const GlobalProvider = ({ children }) => {
     try {
       localStorage.setItem('gastos', JSON.stringify(gastos));
     } catch (error) {
-      console.error("Storage error:", error);
-      alert("Error saving gastos to local storage. Quota might be exceeded.");
+      console.error("Storage error for gastos:", error);
     }
   }, [gastos]);
 
@@ -46,8 +61,7 @@ export const GlobalProvider = ({ children }) => {
     try {
       localStorage.setItem('monthlyBudget', String(monthlyBudget));
     } catch (error) {
-      console.error("Storage error:", error);
-      alert("Error saving budget to local storage.");
+      console.error("Storage error for monthlyBudget:", error);
     }
   }, [monthlyBudget]);
 
@@ -55,13 +69,18 @@ export const GlobalProvider = ({ children }) => {
     try {
       localStorage.setItem('debts', JSON.stringify(debts));
     } catch (error) {
-      console.error("Storage error:", error);
-      alert("Error saving debts to local storage.");
+      console.error("Storage error for debts:", error);
     }
   }, [debts]);
 
   const addExpense = (expense) => {
-    setGastos(prev => [...prev, expense]);
+    const formatted = {
+      ...expense,
+      id: expense.id || Date.now(),
+      amount: Number(expense.amount) || 0,
+      tags: Array.isArray(expense.tags) ? expense.tags : (expense.tags ? String(expense.tags).split(',').map(t => t.trim()).filter(Boolean) : [])
+    };
+    setGastos(prev => [...prev, formatted]);
   };
 
   const deleteExpense = (id) => {
@@ -70,10 +89,16 @@ export const GlobalProvider = ({ children }) => {
   
   const updateExpense = (updatedExpense) => {
     setGastos(prev => prev.map(g => g.id === updatedExpense.id ? updatedExpense : g));
-  }
+  };
 
   const addDebt = (debt) => {
-    setDebts(prev => [...prev, debt]);
+    const formatted = {
+      ...debt,
+      id: debt.id || Date.now(),
+      amount: Number(debt.amount) || 0,
+      paid: Boolean(debt.paid || debt.isPaid || false)
+    };
+    setDebts(prev => [...prev, formatted]);
   };
 
   const deleteDebt = (id) => {
@@ -81,18 +106,91 @@ export const GlobalProvider = ({ children }) => {
   };
 
   const toggleDebtPaid = (id) => {
-    setDebts(prev => prev.map(d => d.id === id ? { ...d, paid: !d.paid } : d));
+    setDebts(prev => prev.map(d => d.id === id ? { ...d, paid: !d.paid, isPaid: !d.paid } : d));
   };
   
   const updateDebt = (updatedDebt) => {
-    setDebts(prev => prev.map(d => d.id === updatedDebt.id ? updatedDebt : d));
-  }
+    setDebts(prev => prev.map(d => d.id === updatedDebt.id ? { ...updatedDebt, paid: Boolean(updatedDebt.paid || updatedDebt.isPaid || false) } : d));
+  };
+
+  const updateBudget = (amount) => {
+    setMonthlyBudget(Number(amount) || 0);
+  };
+
+  const exportDataJSON = () => {
+    try {
+      const customCategories = (() => {
+        try {
+          return JSON.parse(localStorage.getItem('customCategories')) || [];
+        } catch {
+          return [];
+        }
+      })();
+      const data = {
+        version: '1.0',
+        exportDate: new Date().toISOString(),
+        gastos,
+        monthlyBudget,
+        debts,
+        customCategories,
+      };
+      const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data, null, 2))}`;
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', jsonString);
+      downloadAnchor.setAttribute('download', `cuanto_gasto_backup_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    } catch (err) {
+      console.error("Export failed:", err);
+      alert("Error al exportar los datos");
+    }
+  };
+
+  const importDataJSON = (jsonContent) => {
+    try {
+      const data = typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent;
+      if (!data || typeof data !== 'object') {
+        throw new Error('Formato JSON inválido');
+      }
+      if (Array.isArray(data.gastos)) {
+        setGastos(data.gastos);
+      }
+      if (typeof data.monthlyBudget === 'number' || typeof data.monthlyBudget === 'string') {
+        setMonthlyBudget(Number(data.monthlyBudget) || 0);
+      }
+      if (Array.isArray(data.debts)) {
+        setDebts(data.debts.map(d => ({
+          ...d,
+          paid: Boolean(d.paid || d.isPaid || false)
+        })));
+      }
+      if (Array.isArray(data.customCategories)) {
+        localStorage.setItem('customCategories', JSON.stringify(data.customCategories));
+      }
+      return { success: true };
+    } catch (err) {
+      console.error("Import failed:", err);
+      return { success: false, error: err.message };
+    }
+  };
+
+  const clearAllData = () => {
+    setGastos([]);
+    setMonthlyBudget(0);
+    setDebts([]);
+    localStorage.removeItem('gastos');
+    localStorage.removeItem('monthlyBudget');
+    localStorage.removeItem('debts');
+    localStorage.removeItem('customCategories');
+  };
 
   return (
     <GlobalContext.Provider value={{
       gastos, setGastos, addExpense, deleteExpense, updateExpense,
-      monthlyBudget, setMonthlyBudget,
-      debts, setDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt
+      monthlyBudget, setMonthlyBudget, updateBudget,
+      debts, setDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt,
+      exportDataJSON, importDataJSON, clearAllData, DEFAULT_CATEGORIES
     }}>
       {children}
     </GlobalContext.Provider>
@@ -100,3 +198,4 @@ export const GlobalProvider = ({ children }) => {
 };
 
 export const useGlobalContext = () => useContext(GlobalContext);
+

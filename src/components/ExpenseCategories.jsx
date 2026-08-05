@@ -6,11 +6,12 @@ import {
 } from 'recharts';
 import { format } from 'date-fns';
 import ConfirmationModal from './ConfirmationModal';
-import { FaChartPie, FaChartBar, FaChartLine, FaChartArea, FaRegDotCircle } from 'react-icons/fa';
+import { FaChartPie, FaChartBar, FaRegDotCircle } from 'react-icons/fa';
+import { FiSearch, FiTrash2, FiTag } from 'react-icons/fi';
 import { useGlobalContext } from '../context/GlobalContext';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#FF6B6B'];
-const DEBT_COLOR = '#E74C3C';
+const COLORS = ['#6366F1', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6', '#3B82F6'];
+const DEBT_COLOR = '#EF4444';
 
 function useWindowSize() {
   const [windowSize, setWindowSize] = useState({
@@ -51,8 +52,6 @@ const ExpenseCategories = ({ categories, expenses, onDeleteExpense }) => {
   const isMobile = width <= 768;
   
   useEffect(() => {
-    // If we have a search term, we show all expenses matching it, ignoring category filter if we want, or combining them.
-    // Let's combine them:
     const activeDebts = debts.filter(debt => !debt.paid && !debt.isPaid);
 
     let currentExpenses = expenses || [];
@@ -152,44 +151,55 @@ const ExpenseCategories = ({ categories, expenses, onDeleteExpense }) => {
   const isListView = selectedCategory !== null || searchTerm !== '';
   
   return (
-    <div className="category-chart-full">
-      <h2>Gastos por categoría</h2>
+    <div className="w-full glass-card rounded-2xl p-6 border border-slate-800 shadow-xl space-y-5">
+      <h2 className="text-lg font-bold text-slate-100 tracking-wide">Gastos por Categoría</h2>
       
-      <div className="search-filter-container" style={{ width: '100%', marginBottom: '1rem' }}>
+      <div className="relative w-full">
+        <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-base" />
         <input 
           type="text" 
           placeholder="Buscar por descripción o etiqueta..." 
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl glass-input text-sm"
         />
       </div>
 
       {hasData && (
-        <div className="category-filter">
-          <span className="filter-label">Filtrar por:</span>
-          <div className="category-badges">
+        <div className="space-y-2">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Filtrar por:</span>
+          <div className="flex flex-wrap gap-1.5">
             <button 
-              className={`category-badge ${selectedCategory === null ? 'active' : ''}`}
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                selectedCategory === null 
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' 
+                  : 'bg-slate-800/60 text-slate-300 hover:bg-slate-700/60 border border-slate-700/50'
+              }`}
               onClick={showAllCategories}
             >
               Todos
             </button>
-            {categories.map((category, index) => (
-              <button 
-                key={index} 
-                className={`category-badge ${selectedCategory === category.name ? 'active' : ''}`}
-                onClick={() => handleCategorySelect(category.name)}
-                style={{ 
-                  backgroundColor: selectedCategory === category.name ? 
-                    (category.name === 'Deudas fijas' ? DEBT_COLOR : COLORS[index % COLORS.length]) : 
-                    'transparent',
-                  borderColor: category.name === 'Deudas fijas' ? DEBT_COLOR : COLORS[index % COLORS.length] 
-                }}
-              >
-                {category.name}
-              </button>
-            ))}
+            {categories.map((category, index) => {
+              const color = category.name === 'Deudas fijas' ? DEBT_COLOR : COLORS[index % COLORS.length];
+              const isSelected = selectedCategory === category.name;
+              return (
+                <button 
+                  key={index} 
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer border ${
+                    isSelected
+                      ? 'text-white shadow-md'
+                      : 'bg-slate-800/60 text-slate-300 hover:bg-slate-700/60'
+                  }`}
+                  onClick={() => handleCategorySelect(category.name)}
+                  style={{ 
+                    backgroundColor: isSelected ? color : undefined,
+                    borderColor: color 
+                  }}
+                >
+                  {category.name}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -197,184 +207,173 @@ const ExpenseCategories = ({ categories, expenses, onDeleteExpense }) => {
       {hasData || searchTerm !== '' ? (
         !isListView ? (
           <>
-            <div className="chart-type-toggle">
+            <div className="flex items-center justify-center gap-2 pt-2">
               <button 
-                className={`chart-type-btn ${chartType === 'pie' ? 'active' : ''}`}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  chartType === 'pie' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-800/60 text-slate-400 hover:text-slate-200'
+                }`}
                 onClick={() => setChartType('pie')}
                 title="Gráfico Circular"
               >
-                <FaChartPie className="chart-icon" /> Circular
+                <FaChartPie /> Circular
               </button>
               <button 
-                className={`chart-type-btn ${chartType === 'bar' ? 'active' : ''}`}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  chartType === 'bar' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-800/60 text-slate-400 hover:text-slate-200'
+                }`}
                 onClick={() => setChartType('bar')}
                 title="Gráfico de Barras"
               >
-                <FaChartBar className="chart-icon" /> Barras
+                <FaChartBar /> Barras
               </button>
               <button 
-                className={`chart-type-btn ${chartType === 'radar' ? 'active' : ''}`}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  chartType === 'radar' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-800/60 text-slate-400 hover:text-slate-200'
+                }`}
                 onClick={() => setChartType('radar')}
                 title="Gráfico de Radar"
               >
-                <FaRegDotCircle className="chart-icon" /> Radar
+                <FaRegDotCircle /> Radar
               </button>
             </div>
 
-            {chartType === 'pie' ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie 
-                    data={categories} 
-                    cx="50%" 
-                    cy="50%" 
-                    innerRadius={isMobile ? 50 : 80} 
-                    outerRadius={isMobile ? 90 : 120} 
-                    fill="#8884d8"
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({name, value}) => isMobile ? `$${value.toFixed(2)}` : `${name}: $${value.toFixed(2)}`}
-                  >
-                    {categories.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={entry.name === 'Deudas fijas' ? DEBT_COLOR : COLORS[index % COLORS.length]} 
-                      />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            ) : chartType === 'bar' ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={categories}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${value.toFixed(2)}`, 'Monto']} />
-                  <Bar dataKey="value">
-                    {categories.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={entry.name === 'Deudas fijas' ? DEBT_COLOR : COLORS[index % COLORS.length]} 
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            ) : chartType === 'line' ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={timeSeriesData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${value.toFixed(2)}`, 'Monto']} />
-                  <Legend />
-                  <Line type="monotone" dataKey="gasto" name="Gastos Diarios" stroke="#8884d8" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                  <Line type="monotone" dataKey="presupuesto" name="Presupuesto Diario" stroke="#82ca9d" strokeWidth={2} strokeDasharray="5 5" />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : chartType === 'area' ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={timeSeriesData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${value.toFixed(2)}`, 'Monto']} />
-                  <Legend />
-                  <Area type="monotone" dataKey="gasto" name="Gastos Diarios" stroke="#8884d8" fill="#8884d8" fillOpacity={0.3} />
-                  <Area type="monotone" dataKey="presupuesto" name="Presupuesto Diario" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.3} strokeDasharray="5 5" />
-                </AreaChart>
-              </ResponsiveContainer>
-            ) : (
-              <ResponsiveContainer width="100%" height={300}>
-                <RadarChart outerRadius={90} data={comparisonData}>
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="category" />
-                  <PolarRadiusAxis angle={30} domain={[0, 'auto']} />
-                  <Radar name="Gastos por Categoría" dataKey="value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
-                  <Legend />
-                  <Tooltip formatter={(value) => [`$${value.toFixed(2)}`, 'Monto']} />
-                </RadarChart>
-              </ResponsiveContainer>
-            )}
+            <div className="w-full h-72 py-2">
+              {chartType === 'pie' ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie 
+                      data={categories} 
+                      cx="50%" 
+                      cy="50%" 
+                      innerRadius={isMobile ? 45 : 70} 
+                      outerRadius={isMobile ? 85 : 110} 
+                      fill="#8884d8"
+                      paddingAngle={4}
+                      dataKey="value"
+                      label={({name, value}) => isMobile ? `$${value.toFixed(0)}` : `${name}: $${value.toFixed(2)}`}
+                    >
+                      {categories.map((entry, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={entry.name === 'Deudas fijas' ? DEBT_COLOR : COLORS[index % COLORS.length]} 
+                        />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : chartType === 'bar' ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={categories} margin={{ top: 20, right: 20, left: 10, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                    <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 11 }} />
+                    <YAxis stroke="#94a3b8" tick={{ fontSize: 11 }} />
+                    <Tooltip formatter={(value) => [`$${Number(value).toFixed(2)}`, 'Monto']} contentStyle={{ backgroundColor: '#0f172a', borderRadius: '8px', borderColor: '#334155', color: '#fff' }} />
+                    <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                      {categories.map((entry, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={entry.name === 'Deudas fijas' ? DEBT_COLOR : COLORS[index % COLORS.length]} 
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart outerRadius={85} data={comparisonData}>
+                    <PolarGrid stroke="#334155" />
+                    <PolarAngleAxis dataKey="category" stroke="#94a3b8" tick={{ fontSize: 11 }} />
+                    <PolarRadiusAxis angle={30} domain={[0, 'auto']} stroke="#94a3b8" />
+                    <Radar name="Gastos" dataKey="value" stroke="#6366f1" fill="#6366f1" fillOpacity={0.5} />
+                    <Tooltip formatter={(value) => [`$${Number(value).toFixed(2)}`, 'Monto']} contentStyle={{ backgroundColor: '#0f172a', borderRadius: '8px', borderColor: '#334155', color: '#fff' }} />
+                  </RadarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
 
-            <div className="category-list">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
               {categories.map((category, index) => (
                 <div 
                   key={index} 
-                  className="category-item" 
+                  className="flex items-center justify-between p-3 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 cursor-pointer transition-colors" 
                   onClick={() => handleCategorySelect(category.name)}
                 >
-                  <div className="category-color" style={{ backgroundColor: category.name === 'Deudas fijas' ? DEBT_COLOR : COLORS[index % COLORS.length] }}></div>
-                  <div className="category-name">{category.name}</div>
-                  <div className="category-value">${category.value.toFixed(2)}</div>
+                  <div className="flex items-center gap-2.5">
+                    <span 
+                      className="w-3.5 h-3.5 rounded-full shrink-0" 
+                      style={{ backgroundColor: category.name === 'Deudas fijas' ? DEBT_COLOR : COLORS[index % COLORS.length] }}
+                    />
+                    <span className="text-sm font-medium text-slate-200">{category.name}</span>
+                  </div>
+                  <span className="text-sm font-bold text-slate-100">${category.value.toFixed(2)}</span>
                 </div>
               ))}
             </div>
           </>
         ) : (
-          <div className="filtered-expenses">
+          <div className="space-y-4">
             {selectedCategory && (
-              <h3 className="filtered-category-title">
+              <h3 className="text-base font-bold text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-2">
                 <span 
-                  className="category-color" 
+                  className="w-3 h-3 rounded-full inline-block" 
                   style={{ backgroundColor: selectedCategory === 'Deudas fijas' ? DEBT_COLOR : COLORS[categories.findIndex(c => c.name === selectedCategory) % COLORS.length] }}
-                ></span>
+                />
                 {selectedCategory}
               </h3>
             )}
             
             {(selectedCategory === 'Deudas fijas' || (searchTerm && filteredDebts.length > 0)) && (
-              <div className="expense-list">
-                {filteredDebts.length > 0 ? filteredDebts.map((debt) => (
-                  <div key={debt.id} className="expense-item debt-item-in-list">
-                    <div className="expense-date">{new Date(debt.dueDate).toLocaleDateString()} (Vencimiento)</div>
-                    <div className="expense-description">
-                      <strong>{debt.name}</strong>
-                      <span className="debt-category-tag">{debt.category}</span>
+              <div className="space-y-2">
+                {filteredDebts.map((debt) => (
+                  <div key={debt.id} className="flex items-center justify-between p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-100">{debt.name}</h4>
+                      <span className="text-xs text-slate-400">Vence: {new Date(debt.dueDate).toLocaleDateString()} • {debt.category}</span>
                     </div>
-                    <div className="expense-amount">${parseFloat(debt.amount).toFixed(2)}</div>
+                    <span className="text-sm font-extrabold text-rose-400">${parseFloat(debt.amount).toFixed(2)}</span>
                   </div>
-                )) : null}
+                ))}
               </div>
             )}
             
             {(selectedCategory !== 'Deudas fijas' || searchTerm) && (
-              <div className="expense-list">
+              <div className="space-y-2">
                 {filteredExpenses.length > 0 ? filteredExpenses.map((expense) => (
-                  <div key={expense.id} className="expense-item">
-                    <div className="expense-date">{formatDate(expense.date)}</div>
-                    <div className="expense-description">
-                      {expense.description || 'Sin descripción'}
+                  <div key={expense.id} className="flex items-center justify-between p-3.5 rounded-xl bg-slate-900/40 border border-slate-800 hover:border-slate-700 transition-colors">
+                    <div className="space-y-0.5">
+                      <div className="text-xs text-slate-400">{formatDate(expense.date)}</div>
+                      <div className="text-sm font-semibold text-slate-100">
+                        {expense.description || 'Sin descripción'}
+                      </div>
                       {expense.tags && expense.tags.length > 0 && (
-                        <div style={{ fontSize: '0.8em', color: '#666', marginTop: '4px' }}>
-                          Etiquetas: {expense.tags.join(', ')}
+                        <div className="flex items-center gap-1 text-xs text-indigo-400">
+                          <FiTag className="text-[10px]" />
+                          {expense.tags.join(', ')}
                         </div>
                       )}
                     </div>
-                    <div className="expense-amount">${parseFloat(expense.amount).toFixed(2)}</div>
-                    <button 
-                      className="delete-expense-btn" 
-                      onClick={() => handleDeleteClick(expense)}
-                      aria-label="Eliminar gasto"
-                    >
-                      <span className="delete-icon">×</span>
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-extrabold text-slate-100">${parseFloat(expense.amount).toFixed(2)}</span>
+                      <button 
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer" 
+                        onClick={() => handleDeleteClick(expense)}
+                        aria-label="Eliminar gasto"
+                      >
+                        <FiTrash2 className="text-base" />
+                      </button>
+                    </div>
                   </div>
                 )) : (
-                  <p>No se encontraron gastos.</p>
+                  <p className="text-sm text-slate-400 text-center py-6">No se encontraron gastos.</p>
                 )}
               </div>
             )}
           </div>
         )
       ) : (
-        <div className="no-data-message">
-          <p>No hay gastos registrados todavía.</p>
-          <p>Agrega gastos para ver estadísticas por categoría.</p>
+        <div className="text-center py-8 text-slate-400 text-sm space-y-1">
+          <p className="font-semibold text-slate-300">No hay gastos registrados todavía.</p>
+          <p className="text-xs text-slate-500">Agrega gastos para ver estadísticas por categoría.</p>
         </div>
       )}
       

@@ -1,0 +1,9 @@
+{
+  "strict_tdd": false,
+  "runner": "none",
+  "layers": [],
+  "coverage": "none",
+  "linter": "eslint (eslint .)",
+  "formatter": "none detected",
+  "type_checker": "none (JavaScript/JSX project)"
+}

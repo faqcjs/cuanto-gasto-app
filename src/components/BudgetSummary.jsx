@@ -1,73 +1,87 @@
 import React from 'react';
-import { LinearProgress } from '@mui/material';
 
 const BudgetSummary = ({ totalSpent, monthlyBudget, onBudgetClick, onDeleteBudget }) => {
   const hasBudget = monthlyBudget > 0;
-  
+  const remaining = monthlyBudget - totalSpent;
+  const progressPercent = hasBudget ? Math.min(100, Math.max(0, (totalSpent / monthlyBudget) * 100)) : 0;
+  const isOverBudget = remaining < 0;
+
   return (
-    <div className="budget-summary">
-      <h2>Resumen de presupuesto</h2>
-      
+    <div className="w-full glass-card rounded-2xl p-6 border border-slate-800 shadow-xl space-y-5">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-bold text-slate-100 tracking-wide">Resumen de Presupuesto</h2>
+        {hasBudget && (
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
+            isOverBudget 
+              ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' 
+              : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+          }`}>
+            {isOverBudget ? 'Excedido' : 'Dentro del límite'}
+          </span>
+        )}
+      </div>
+
       {hasBudget ? (
-        <>
-          {/* Mostrar el restante (presupuesto - gastado) */}
-          <div className="budget-remaining">
-            <h3>Restante</h3>
-            <h1 className={monthlyBudget - totalSpent >= 0 ? "positive" : "negative"}>
-              ${(monthlyBudget - totalSpent).toFixed(2)}
+        <div className="space-y-4">
+          <div className="text-center py-3 bg-slate-900/40 rounded-xl border border-slate-800/80">
+            <span className="text-xs uppercase font-semibold tracking-wider text-slate-400">Restante</span>
+            <h1 className={`text-3xl sm:text-4xl font-extrabold mt-1 tracking-tight ${
+              remaining >= 0 ? 'text-emerald-400' : 'text-rose-400'
+            }`}>
+              ${remaining.toFixed(2)}
             </h1>
           </div>
-          
-          {/* Barra de progreso */}
-          <LinearProgress 
-            variant="determinate" 
-            value={monthlyBudget > 0 ? (totalSpent / monthlyBudget) * 100 : 0}
-            sx={{
-              height: 10,
-              borderRadius: 5,
-              backgroundColor: '#f5f5f5',
-              '& .MuiLinearProgress-bar': {
-                borderRadius: 5,
-                backgroundColor: totalSpent <= monthlyBudget ? '#2196F3' : '#f44336'
-              }
-            }}
-          />
-          
-          {/* Información de presupuesto y gasto */}
-          <div className="budget-info">
-            <span>Gastado: ${totalSpent.toFixed(2)}</span>
-            <span>Presupuesto: ${monthlyBudget}</span>
+
+          {/* Custom Tailwind Progress Bar */}
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-xs text-slate-400 font-medium">
+              <span>Uso del presupuesto</span>
+              <span>{progressPercent.toFixed(1)}%</span>
+            </div>
+            <div className="w-full bg-slate-800 rounded-full h-3 overflow-hidden p-0.5 border border-slate-700/50">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  isOverBudget 
+                    ? 'bg-gradient-to-r from-rose-500 to-red-600 shadow-lg shadow-rose-500/30' 
+                    : 'bg-gradient-to-r from-indigo-500 to-emerald-400 shadow-lg shadow-indigo-500/30'
+                }`}
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
           </div>
-        </>
+
+          <div className="flex justify-between text-sm text-slate-300 font-medium pt-1">
+            <span className="text-slate-400">Gastado: <strong className="text-slate-100">${totalSpent.toFixed(2)}</strong></span>
+            <span className="text-slate-400">Presupuesto: <strong className="text-indigo-300">${monthlyBudget.toFixed(2)}</strong></span>
+          </div>
+        </div>
       ) : (
-        <>
-          {/* Mostrar el gasto total en negativo cuando no hay presupuesto */}
-          <div className="budget-remaining budget-negative">
-            <h3>Total Gastado</h3>
-            <h1 className="negative">
+        <div className="space-y-4">
+          <div className="text-center py-4 bg-rose-500/5 rounded-xl border border-rose-500/20">
+            <span className="text-xs uppercase font-semibold tracking-wider text-slate-400">Total Gastado</span>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-rose-400 mt-1 tracking-tight">
               -${totalSpent.toFixed(2)}
             </h1>
           </div>
-          
-          <div className="empty-state">
-            <p>No has establecido un presupuesto mensual</p>
-            <p>Establece tu presupuesto para comenzar a controlar tus gastos</p>
+
+          <div className="text-center py-4 text-slate-400 text-sm space-y-1">
+            <p className="font-semibold text-slate-200">No has establecido un presupuesto mensual</p>
+            <p className="text-xs text-slate-400">Establece tu presupuesto para comenzar a controlar tus gastos.</p>
           </div>
-        </>
+        </div>
       )}
-      
-      {/* Botones para gestionar el presupuesto */}
-      <div className="budget-actions">
-        <button 
-          className="primary-button budget-button"
+
+      <div className="flex flex-wrap items-center gap-3 pt-2">
+        <button
+          className="flex-1 min-w-[160px] px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/25 transition-all duration-200 cursor-pointer"
           onClick={onBudgetClick}
         >
           {hasBudget ? 'Modificar presupuesto' : 'Establecer presupuesto'}
         </button>
-        
+
         {hasBudget && (
-          <button 
-            className="danger-button budget-button"
+          <button
+            className="px-4 py-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 text-sm font-semibold transition-all duration-200 cursor-pointer"
             onClick={onDeleteBudget}
           >
             Eliminar presupuesto
