@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import BudgetSummary from './BudgetSummary';
+import BudgetTimelineChart from './BudgetTimelineChart';
 import ExpenseCategories from './ExpenseCategories';
 import ConfirmationModal from './ConfirmationModal';
 import BudgetModal from './BudgetModal';
@@ -7,7 +8,7 @@ import AddIncomeModal from './AddIncomeModal';
 import { useGlobalContext } from '../context/GlobalContext';
 
 const Dashboard = () => {
-  const { gastos, monthlyBudget, setMonthlyBudget, debts, deleteExpense } = useGlobalContext();
+  const { gastos, incomes, addIncomeRecord, monthlyBudget, setMonthlyBudget, debts, deleteExpense } = useGlobalContext();
   
   const [totalSpent, setTotalSpent] = useState(0);
   const [categories, setCategories] = useState([]);
@@ -50,6 +51,7 @@ const Dashboard = () => {
   };
 
   const handleAddIncome = (amount) => {
+    addIncomeRecord(amount, 'Ingreso Extra');
     const newBudget = monthlyBudget + amount;
     setMonthlyBudget(newBudget);
     setTempBudget(newBudget);
@@ -84,6 +86,14 @@ const Dashboard = () => {
             onBudgetClick={() => setIsBudgetModalOpen(true)}
             onDeleteBudget={() => setIsDeleteModalOpen(true)}
           />
+
+          {/* Timeline Chart below Budget Summary */}
+          <BudgetTimelineChart 
+            gastos={gastos} 
+            incomes={incomes} 
+            monthlyBudget={monthlyBudget} 
+          />
+
           <ExpenseCategories 
             categories={categories} 
             expenses={gastos} 

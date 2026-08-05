@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { format } from 'date-fns';
 
 export const DEFAULT_CATEGORIES = [
   { id: 'Comida', name: 'Comida', color: '#FF6B6B', icon: 'Restaurant' },
@@ -19,6 +20,16 @@ export const GlobalProvider = ({ children }) => {
       return item ? JSON.parse(item) : [];
     } catch (error) {
       console.error('Error reading gastos from storage:', error);
+      return [];
+    }
+  });
+
+  const [incomes, setIncomes] = useState(() => {
+    try {
+      const item = localStorage.getItem('incomes');
+      return item ? JSON.parse(item) : [];
+    } catch (error) {
+      console.error('Error reading incomes from storage:', error);
       return [];
     }
   });
@@ -56,6 +67,14 @@ export const GlobalProvider = ({ children }) => {
       console.error("Storage error for gastos:", error);
     }
   }, [gastos]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('incomes', JSON.stringify(incomes));
+    } catch (error) {
+      console.error("Storage error for incomes:", error);
+    }
+  }, [incomes]);
 
   useEffect(() => {
     try {
@@ -175,11 +194,23 @@ export const GlobalProvider = ({ children }) => {
     }
   };
 
+  const addIncomeRecord = (amount, description = 'Ingreso Extra') => {
+    const formatted = {
+      id: Date.now(),
+      amount: Number(amount) || 0,
+      description,
+      date: format(new Date(), 'yyyy-MM-dd')
+    };
+    setIncomes(prev => [...prev, formatted]);
+  };
+
   const clearAllData = () => {
     setGastos([]);
+    setIncomes([]);
     setMonthlyBudget(0);
     setDebts([]);
     localStorage.removeItem('gastos');
+    localStorage.removeItem('incomes');
     localStorage.removeItem('monthlyBudget');
     localStorage.removeItem('debts');
     localStorage.removeItem('customCategories');
@@ -188,6 +219,7 @@ export const GlobalProvider = ({ children }) => {
   return (
     <GlobalContext.Provider value={{
       gastos, setGastos, addExpense, deleteExpense, updateExpense,
+      incomes, setIncomes, addIncomeRecord,
       monthlyBudget, setMonthlyBudget, updateBudget,
       debts, setDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt,
       exportDataJSON, importDataJSON, clearAllData, DEFAULT_CATEGORIES
