@@ -3,6 +3,7 @@ import BudgetSummary from './BudgetSummary';
 import ExpenseCategories from './ExpenseCategories';
 import ConfirmationModal from './ConfirmationModal';
 import BudgetModal from './BudgetModal';
+import AddIncomeModal from './AddIncomeModal';
 import { useGlobalContext } from '../context/GlobalContext';
 
 const Dashboard = () => {
@@ -11,6 +12,7 @@ const Dashboard = () => {
   const [totalSpent, setTotalSpent] = useState(0);
   const [categories, setCategories] = useState([]);
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+  const [isIncomeModalOpen, setIsIncomeModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [tempBudget, setTempBudget] = useState(monthlyBudget);
 
@@ -47,6 +49,12 @@ const Dashboard = () => {
     setIsDeleteModalOpen(false);
   };
 
+  const handleAddIncome = (amount) => {
+    const newBudget = monthlyBudget + amount;
+    setMonthlyBudget(newBudget);
+    setTempBudget(newBudget);
+  };
+
   return (
     <div className="w-full space-y-6">
       {categories.length === 0 && monthlyBudget === 0 ? (
@@ -72,6 +80,7 @@ const Dashboard = () => {
           <BudgetSummary 
             totalSpent={totalSpent} 
             monthlyBudget={monthlyBudget} 
+            onAddIncomeClick={() => setIsIncomeModalOpen(true)}
             onBudgetClick={() => setIsBudgetModalOpen(true)}
             onDeleteBudget={() => setIsDeleteModalOpen(true)}
           />
@@ -83,6 +92,12 @@ const Dashboard = () => {
         </div>
       )}
       
+      <AddIncomeModal 
+        isOpen={isIncomeModalOpen}
+        onClose={() => setIsIncomeModalOpen(false)}
+        onAddIncome={handleAddIncome}
+      />
+
       <BudgetModal 
         isOpen={isBudgetModalOpen}
         onClose={() => setIsBudgetModalOpen(false)}
@@ -96,7 +111,7 @@ const Dashboard = () => {
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={deleteBudget}
         title="Eliminar Presupuesto"
-        message="¿Estás seguro de que deseas eliminar el presupuesto mensual? Esta acción no se puede deshacer."
+        message="¿Estás seguro de que deseas eliminar el presupuesto mensual? Esta acción dejará tu presupuesto en $0 pero mantendrá todos tus gastos guardados."
         confirmButtonText="Eliminar"
         cancelButtonText="Cancelar"
       />

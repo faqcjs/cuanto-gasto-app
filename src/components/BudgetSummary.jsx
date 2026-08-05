@@ -1,7 +1,13 @@
 import React from 'react';
-import { FiTrash2, FiDollarSign } from 'react-icons/fi';
+import { FiTrash2, FiSliders, FiTrendingUp } from 'react-icons/fi';
 
-const BudgetSummary = ({ totalSpent, monthlyBudget, onBudgetClick, onDeleteBudget }) => {
+const BudgetSummary = ({ 
+  totalSpent, 
+  monthlyBudget, 
+  onAddIncomeClick, 
+  onBudgetClick, 
+  onDeleteBudget 
+}) => {
   const hasBudget = monthlyBudget > 0;
   const remaining = monthlyBudget - totalSpent;
   const progressPercent = hasBudget ? Math.min(100, Math.max(0, (totalSpent / monthlyBudget) * 100)) : 0;
@@ -72,24 +78,37 @@ const BudgetSummary = ({ totalSpent, monthlyBudget, onBudgetClick, onDeleteBudge
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-2 w-full">
+      {/* 3 Icon-Only Action Buttons in a Row (3 en línea) */}
+      <div className="flex items-center justify-between gap-3 pt-2 w-full">
+        {/* Button 1: Ingreso de dinero extra */}
         <button
-          className="w-full sm:flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/25 transition-all duration-200 cursor-pointer min-w-0"
-          onClick={onBudgetClick}
+          className="flex-1 py-3 px-4 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30 flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg shadow-emerald-500/10 active:scale-95"
+          onClick={onAddIncomeClick}
+          title="Ingresar dinero extra (ej: cobro de un trabajo)"
+          aria-label="Ingresar dinero extra"
         >
-          <FiDollarSign className="text-lg text-emerald-300 shrink-0" />
-          <span className="truncate">{hasBudget ? 'Modificar Presupuesto' : 'Ingresar Presupuesto'}</span>
+          <FiTrendingUp className="text-xl text-emerald-400" />
         </button>
 
+        {/* Button 2: Modificar presupuesto */}
+        <button
+          className="flex-1 py-3 px-4 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg shadow-indigo-600/10 active:scale-95"
+          onClick={onBudgetClick}
+          title="Modificar presupuesto mensual"
+          aria-label="Modificar presupuesto mensual"
+        >
+          <FiSliders className="text-xl text-indigo-300" />
+        </button>
+
+        {/* Button 3: Eliminar presupuesto */}
         {hasBudget && (
           <button
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-sm font-semibold transition-all duration-200 cursor-pointer shrink-0"
+            className="flex-1 py-3 px-4 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg shadow-rose-500/10 active:scale-95"
             onClick={onDeleteBudget}
-            title="Eliminar Presupuesto"
-            aria-label="Eliminar Presupuesto"
+            title="Eliminar presupuesto mensual"
+            aria-label="Eliminar presupuesto mensual"
           >
-            <FiTrash2 className="text-base text-rose-400" />
-            <span className="sm:hidden">Eliminar Presupuesto</span>
+            <FiTrash2 className="text-xl text-rose-400" />
           </button>
         )}
       </div>
