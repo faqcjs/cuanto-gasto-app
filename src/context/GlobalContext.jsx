@@ -209,6 +209,41 @@ export const GlobalProvider = ({ children }) => {
     }
   };
 
+  const exportDataCSV = () => {
+    try {
+      const escape = (val) => {
+        const str = String(val ?? '');
+        return str.includes(',') || str.includes('"') || str.includes('\n')
+          ? `"${str.replace(/"/g, '""')}"`
+          : str;
+      };
+
+      const headers = ['Fecha', 'Descripcion', 'Categoria', 'Monto', 'Metodo de pago', 'Etiquetas'];
+      const rows = gastos.map(g => [
+        escape(g.date || ''),
+        escape(g.description || ''),
+        escape(g.category || ''),
+        escape(Number(g.amount || 0).toFixed(2)),
+        escape(g.paymentMethod || ''),
+        escape(Array.isArray(g.tags) ? g.tags.join(';') : (g.tags || '')),
+      ]);
+
+      const csvContent = [headers, ...rows].map(r => r.join(',')).join('\n');
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `gastos_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('CSV export failed:', err);
+      alert('Error al exportar el CSV');
+    }
+  };
+
   const importDataJSON = (jsonContent) => {
     try {
       const data = typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent;
@@ -265,7 +300,7 @@ export const GlobalProvider = ({ children }) => {
       incomes, setIncomes, addIncomeRecord, addMultipleIncomes,
       monthlyBudget, setMonthlyBudget, updateBudget,
       debts, setDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt,
-      exportDataJSON, importDataJSON, clearAllData, DEFAULT_CATEGORIES
+      exportDataJSON, exportDataCSV, importDataJSON, clearAllData, DEFAULT_CATEGORIES
     }}>
       {children}
     </GlobalContext.Provider>

@@ -9,7 +9,8 @@ import {
   FiFilter,
   FiShoppingBag,
   FiRefreshCw,
-  FiAlertTriangle
+  FiAlertTriangle,
+  FiDownload
 } from 'react-icons/fi';
 import { format } from 'date-fns';
 import { useGlobalContext } from '../context/GlobalContext';
@@ -18,7 +19,7 @@ import EditExpenseModal from './EditExpenseModal';
 import ConfirmationModal from './ConfirmationModal';
 
 const Expenses = () => {
-  const { gastos, addMultipleExpenses, updateExpense, deleteExpense, clearAllData, DEFAULT_CATEGORIES } = useGlobalContext();
+  const { gastos, addMultipleExpenses, updateExpense, deleteExpense, clearAllData, exportDataCSV, DEFAULT_CATEGORIES } = useGlobalContext();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todas');
@@ -132,6 +133,17 @@ const Expenses = () => {
             >
               <FiRefreshCw className={`text-sm ${syncingMP ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Sincronizar MP</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={exportDataCSV}
+              disabled={gastos.length === 0}
+              className="px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+              title="Exportar gastos como CSV"
+            >
+              <FiDownload className="text-sm" />
+              <span className="hidden sm:inline">Exportar CSV</span>
             </button>
 
             <button
