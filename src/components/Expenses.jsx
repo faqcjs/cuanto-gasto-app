@@ -7,22 +7,44 @@ import {
   FiCalendar, 
   FiCreditCard, 
   FiFilter,
-  FiShoppingBag
+  FiShoppingBag,
+  FiRefreshCw
 } from 'react-icons/fi';
 import { format } from 'date-fns';
 import { useGlobalContext } from '../context/GlobalContext';
+import { fetchMPPayments, getMPToken } from '../services/mercadoPagoService';
 import EditExpenseModal from './EditExpenseModal';
 import ConfirmationModal from './ConfirmationModal';
 
 const Expenses = () => {
-  const { gastos, updateExpense, deleteExpense, DEFAULT_CATEGORIES } = useGlobalContext();
+  const { gastos, addMultipleExpenses, updateExpense, deleteExpense, DEFAULT_CATEGORIES } = useGlobalContext();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todas');
   const [sortBy, setSortBy] = useState('recent'); // 'recent', 'highest', 'lowest'
+  const [syncingMP, setSyncingMP] = useState(false);
   
   const [editingExpense, setEditingExpense] = useState(null);
   const [deletingExpense, setDeletingExpense] = useState(null);
+
+  const handleQuickMPSync = async () => {
+    const token = getMPToken();
+    if (!token) {
+      alert('Para sincronizar con Mercado Pago, primero configurá tu Access Token en Ajustes.');
+      return;
+    }
+
+    setSyncingMP(true);
+    try {
+      const res = await fetchMPPayments(token);
+      const imported = addMultipleExpenses(res.expenses);
+      alert(imported > 0 ? `¡Sincronización exitosa! Se importaron ${imported} gastos nuevos de Mercado Pago.` : 'Tus gastos de Mercado Pago ya están al día.');
+    } catch (err) {
+      alert(`Error al sincronizar: ${err.message}`);
+    } finally {
+      setSyncingMP(false);
+    }
+  };
 
   // Filtered and sorted expenses list
   const filteredExpenses = useMemo(() => {
@@ -93,9 +115,22 @@ const Expenses = () => {
             </p>
           </div>
 
-          <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center justify-between sm:justify-end gap-3 self-start sm:self-auto shrink-0">
-            <span className="text-xs uppercase font-semibold text-slate-400">Total en vista:</span>
-            <strong className="text-lg font-black text-indigo-300">${totalFilteredAmount.toFixed(2)}</strong>
+          <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0">
+            <button
+              type="button"
+              onClick={handleQuickMPSync}
+              disabled={syncingMP}
+              className="px-3 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
+              title="Sincronizar Mercado Pago"
+            >
+              <FiRefreshCw className={`text-sm ${syncingMP ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">Sincronizar MP</span>
+            </button>
+
+            <div className="bg-slate-900/60 p-2.5 sm:p-3 rounded-xl border border-slate-800 flex items-center gap-2">
+              <span className="text-[10px] sm:text-xs uppercase font-semibold text-slate-400">Total:</span>
+              <strong className="text-base sm:text-lg font-black text-indigo-300">${totalFilteredAmount.toFixed(2)}</strong>
+            </div>
           </div>
         </div>
 

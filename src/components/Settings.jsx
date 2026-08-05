@@ -8,6 +8,7 @@ import {
   FiSave 
 } from 'react-icons/fi';
 import ConfirmationModal from './ConfirmationModal';
+import MercadoPagoSync from './MercadoPagoSync';
 import { useGlobalContext } from '../context/GlobalContext';
 
 const Settings = () => {
@@ -148,8 +149,11 @@ const Settings = () => {
       <h2 className="text-xl font-bold text-slate-100 border-b border-slate-800 pb-4">
         Ajustes & Configuración
       </h2>
+
+      {/* Section 1: Mercado Pago API Sync */}
+      <MercadoPagoSync />
       
-      {/* Section 1: Presupuesto Mensual */}
+      {/* Section 2: Presupuesto Mensual */}
       <div className="bg-slate-900/50 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-4">
         <h3 className="text-base font-bold text-slate-100">Presupuesto Mensual</h3>
         <p className="text-xs text-slate-400">

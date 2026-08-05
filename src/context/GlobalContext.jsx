@@ -102,6 +102,28 @@ export const GlobalProvider = ({ children }) => {
     setGastos(prev => [...prev, formatted]);
   };
 
+  const addMultipleExpenses = (newExpenses) => {
+    if (!Array.isArray(newExpenses) || newExpenses.length === 0) return 0;
+    
+    let addedCount = 0;
+    setGastos(prev => {
+      const existingIds = new Set(prev.map(g => g.externalId || g.id));
+      const filtered = newExpenses.filter(e => !existingIds.has(e.externalId || e.id));
+      addedCount = filtered.length;
+
+      const formattedList = filtered.map((expense, idx) => ({
+        ...expense,
+        id: expense.id || `exp_${Date.now()}_${idx}`,
+        amount: Number(expense.amount) || 0,
+        tags: Array.isArray(expense.tags) ? expense.tags : (expense.tags ? String(expense.tags).split(',').map(t => t.trim()).filter(Boolean) : [])
+      }));
+
+      return [...prev, ...formattedList];
+    });
+
+    return addedCount;
+  };
+
   const deleteExpense = (id) => {
     setGastos(prev => prev.filter(g => g.id !== id));
   };
@@ -218,7 +240,7 @@ export const GlobalProvider = ({ children }) => {
 
   return (
     <GlobalContext.Provider value={{
-      gastos, setGastos, addExpense, deleteExpense, updateExpense,
+      gastos, setGastos, addExpense, addMultipleExpenses, deleteExpense, updateExpense,
       incomes, setIncomes, addIncomeRecord,
       monthlyBudget, setMonthlyBudget, updateBudget,
       debts, setDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt,
