@@ -58,14 +58,6 @@ const AddIncomeModal = ({ isOpen, onClose, onAddIncome }) => {
           </button>
         </div>
 
-        {/* Modal Explanation Banner */}
-        <div className="bg-emerald-500/10 p-3.5 rounded-xl border border-emerald-500/20 text-xs text-emerald-300 space-y-1">
-          <p className="font-semibold text-emerald-200">¿Qué hace esta acción?</p>
-          <p className="leading-relaxed text-slate-300">
-            Sumá ingresos adicionales a tu presupuesto actual (por ejemplo: el pago de un trabajo freelance, un bono o una venta). Esto incrementará el saldo disponible total.
-          </p>
-        </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <label htmlFor="income-amount" className="block text-xs font-semibold uppercase tracking-wider text-slate-400">

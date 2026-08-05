@@ -36,14 +36,6 @@ const BudgetModal = ({ isOpen, onClose, tempBudget, setTempBudget, setMonthlyBud
     <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}>
       <div className="w-full max-w-md glass-card rounded-2xl p-6 border border-indigo-500/20 shadow-2xl space-y-5">
         <h2 className="text-xl font-bold text-slate-100">Modificar Presupuesto Mensual</h2>
-        
-        {/* Modal Explanation Banner */}
-        <div className="bg-indigo-500/10 p-3.5 rounded-xl border border-indigo-500/20 text-xs text-indigo-300 space-y-1">
-          <p className="font-semibold text-indigo-200">¿Qué hace esta acción?</p>
-          <p className="leading-relaxed text-slate-300">
-            Reemplazá el límite total de tu presupuesto mensual por un nuevo valor fijo desde cero. Ideal para definir tu presupuesto fijo al comenzar el mes.
-          </p>
-        </div>
         <div className="space-y-1.5">
           <label htmlFor="budget-modal" className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
             Ingrese su presupuesto mensual ($)
