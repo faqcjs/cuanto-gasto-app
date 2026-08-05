@@ -12,7 +12,7 @@ import { parseMPCSV } from '../services/mpCSVService';
 import { useGlobalContext } from '../context/GlobalContext';
 
 const MPCSVImport = () => {
-  const { addMultipleExpenses } = useGlobalContext();
+  const { addMultipleExpenses, addMultipleIncomes } = useGlobalContext();
   const fileInputRef = useRef(null);
 
   const [dragging, setDragging] = useState(false);
@@ -70,18 +70,21 @@ const MPCSVImport = () => {
 
   const handleImport = () => {
     if (!preview) return;
-    const imported = addMultipleExpenses(preview.expenses);
-    setResult({
-      imported,
-      message:
-        imported > 0
-          ? `¡Importación exitosa! ${imported} gasto(s) nuevo(s) cargados.${
-              preview.incomes.length > 0
-                ? ` (${preview.incomes.length} ingreso(s) detectados — próximamente se importarán también)`
-                : ''
-            }`
-          : 'Todos los gastos del CSV ya estaban registrados (sin duplicados).',
-    });
+    const importedExpenses = addMultipleExpenses(preview.expenses);
+    const importedIncomes  = addMultipleIncomes(preview.incomes);
+    const total = importedExpenses + importedIncomes;
+
+    let msg = '';
+    if (total > 0) {
+      const parts = [];
+      if (importedExpenses > 0) parts.push(`${importedExpenses} gasto(s)`);
+      if (importedIncomes  > 0) parts.push(`${importedIncomes} ingreso(s)`);
+      msg = `¡Importación exitosa! Se cargaron ${parts.join(' y ')} de Mercado Pago.`;
+    } else {
+      msg = 'Todos los movimientos del CSV ya estaban registrados (sin duplicados).';
+    }
+
+    setResult({ imported: total, message: msg });
     setPreview(null);
   };
 
@@ -227,15 +230,15 @@ const MPCSVImport = () => {
           {/* Import button */}
           <button
             onClick={handleImport}
-            disabled={preview.expenses.length === 0}
+            disabled={preview.expenses.length === 0 && preview.incomes.length === 0}
             className={`w-full py-3 rounded-xl font-bold text-sm transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
-              preview.expenses.length > 0
+              (preview.expenses.length > 0 || preview.incomes.length > 0)
                 ? 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white shadow-lg shadow-emerald-500/20 active:scale-95'
                 : 'bg-slate-800 text-slate-500 cursor-not-allowed'
             }`}
           >
             <FiUploadCloud className="text-base" />
-            Importar {preview.expenses.length} gasto(s)
+            Importar {preview.expenses.length} gasto(s) y {preview.incomes.length} ingreso(s)
           </button>
         </div>
       )}
