@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiTrash2, FiSliders, FiTrendingUp } from 'react-icons/fi';
+import { FiTrash2, FiSliders, FiTrendingUp, FiTrendingDown } from 'react-icons/fi';
 
 const BudgetSummary = ({ 
   totalSpent, 
