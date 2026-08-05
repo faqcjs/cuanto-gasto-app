@@ -144,18 +144,18 @@ const Settings = () => {
   };
 
   return (
-    <div className="w-full glass-card rounded-2xl p-6 sm:p-8 border border-slate-800 shadow-xl space-y-6">
+    <div className="w-full max-w-full overflow-hidden glass-card rounded-2xl p-4 sm:p-6 md:p-8 border border-slate-800 shadow-xl space-y-6">
       <h2 className="text-xl font-bold text-slate-100 border-b border-slate-800 pb-4">
         Ajustes & Configuración
       </h2>
       
       {/* Section 1: Presupuesto Mensual */}
-      <div className="bg-slate-900/50 p-5 rounded-2xl border border-slate-800 space-y-4">
+      <div className="bg-slate-900/50 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-4">
         <h3 className="text-base font-bold text-slate-100">Presupuesto Mensual</h3>
         <p className="text-xs text-slate-400">
           Define el límite de gasto mensual para visualizar el progreso en tu resumen.
         </p>
-        <form onSubmit={handleSaveBudget} className="flex flex-wrap items-center gap-3">
+        <form onSubmit={handleSaveBudget} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
           <input
             type="number"
             value={budgetInput}
@@ -163,11 +163,11 @@ const Settings = () => {
             placeholder="Ej: 150000"
             min="0"
             step="any"
-            className="flex-1 min-w-[200px] px-4 py-2.5 rounded-xl glass-input text-sm"
+            className="w-full sm:flex-1 px-4 py-2.5 rounded-xl glass-input text-sm min-w-0"
           />
           <button 
             type="submit" 
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all cursor-pointer shrink-0"
           >
             <FiSave className="text-base" /> Guardar Presupuesto
           </button>
@@ -176,7 +176,7 @@ const Settings = () => {
 
       {/* Section 2: PWA Install Prompt */}
       {(isInstallable || isIOS) && (
-        <div className="bg-slate-900/50 p-5 rounded-2xl border border-slate-800 space-y-4">
+        <div className="bg-slate-900/50 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-4">
           <h3 className="text-base font-bold text-slate-100">Instalar Aplicación</h3>
           {isInstallable && (
             <div className="space-y-3">
@@ -200,17 +200,17 @@ const Settings = () => {
       )}
 
       {/* Section 3: Backup Data (Export & Import JSON) */}
-      <div className="bg-slate-900/50 p-5 rounded-2xl border border-slate-800 space-y-4">
+      <div className="bg-slate-900/50 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-4">
         <h3 className="text-base font-bold text-slate-100">Copia de Seguridad y Datos</h3>
         <p className="text-xs text-slate-400">
           Exporta todos tus datos a un archivo JSON para respaldo o impórtalos en otro dispositivo.
         </p>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col sm:flex-row gap-3 w-full">
           <button 
             type="button" 
             onClick={exportDataJSON}
-            className="flex-1 min-w-[180px] flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/25 transition-all cursor-pointer"
+            className="w-full sm:flex-1 flex items-center justify-center gap-2 py-3 sm:py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/25 transition-all cursor-pointer min-w-0"
           >
             <FiDownload className="text-base" /> Exportar JSON
           </button>
@@ -218,7 +218,7 @@ const Settings = () => {
           <button 
             type="button" 
             onClick={() => fileInputRef.current && fileInputRef.current.click()}
-            className="flex-1 min-w-[180px] flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold shadow-lg shadow-emerald-600/25 transition-all cursor-pointer"
+            className="w-full sm:flex-1 flex items-center justify-center gap-2 py-3 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold shadow-lg shadow-emerald-600/25 transition-all cursor-pointer min-w-0"
           >
             <FiUpload className="text-base" /> Importar JSON
           </button>
@@ -234,25 +234,25 @@ const Settings = () => {
       </div>
 
       {/* Section 4: Categorías Personalizadas */}
-      <div className="bg-slate-900/50 p-5 rounded-2xl border border-slate-800 space-y-4">
+      <div className="bg-slate-900/50 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-4">
         <h3 className="text-base font-bold text-slate-100">Categorías Personalizadas</h3>
         <p className="text-xs text-slate-400">
           Agrega categorías personalizadas para clasificar tus gastos.
         </p>
         
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2.5 w-full">
           <input 
             type="text" 
             value={newCategory} 
             onChange={(e) => setNewCategory(e.target.value)} 
             placeholder="Nombre de la categoría"
-            className="flex-1 px-4 py-2.5 rounded-xl glass-input text-sm"
+            className="w-full sm:flex-1 px-4 py-2.5 rounded-xl glass-input text-sm min-w-0"
           />
           <button 
             type="button"
             onClick={handleAddCategory}
             disabled={!newCategory.trim()}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-semibold shadow-lg transition-all cursor-pointer"
+            className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-semibold shadow-lg transition-all cursor-pointer shrink-0"
           >
             <FiPlus className="text-base" /> Agregar
           </button>
@@ -261,15 +261,15 @@ const Settings = () => {
         {customCategories.length > 0 ? (
           <div className="space-y-2 pt-2">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Categorías actuales:</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
               {customCategories.map((category, index) => (
-                <div key={index} className="flex items-center justify-between p-3 rounded-xl bg-slate-950/40 border border-slate-800">
-                  <span className="text-sm font-medium text-slate-200">{category}</span>
+                <div key={index} className="flex items-center justify-between p-3 rounded-xl bg-slate-950/40 border border-slate-800 min-w-0 w-full">
+                  <span className="text-sm font-medium text-slate-200 truncate pr-2">{category}</span>
                   <button 
                     type="button"
                     onClick={() => handleDeleteCategoryClick(category)}
                     aria-label={`Eliminar categoría ${category}`}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer shrink-0"
                   >
                     <FiTrash2 className="text-sm" />
                   </button>
@@ -283,7 +283,7 @@ const Settings = () => {
       </div>
 
       {/* Section 5: Zona de Peligro (Borrar Datos) */}
-      <div className="bg-rose-500/5 p-5 rounded-2xl border border-rose-500/30 space-y-4">
+      <div className="bg-rose-500/5 p-4 sm:p-5 rounded-2xl border border-rose-500/30 space-y-4">
         <h3 className="text-base font-bold text-rose-400">Zona de Peligro</h3>
         <p className="text-xs text-slate-400">
           Elimina permanentemente todos los gastos, deudas y configuraciones almacenadas.
@@ -291,7 +291,7 @@ const Settings = () => {
         <button 
           type="button" 
           onClick={() => setShowClearAllModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/40 text-sm font-semibold transition-all cursor-pointer"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/40 text-sm font-semibold transition-all cursor-pointer"
         >
           <FiAlertTriangle className="text-base" /> Borrar Todos los Datos
         </button>

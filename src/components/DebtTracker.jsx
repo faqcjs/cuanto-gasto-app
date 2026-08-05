@@ -151,18 +151,18 @@ const DebtTracker = () => {
         )}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
         <button 
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
           onClick={() => setIsFormVisible(!isFormVisible)}
         >
           <FiPlus className="text-lg" /> {isFormVisible ? 'Cerrar Formulario' : 'Agregar Deuda'}
         </button>
 
-        <div className="flex items-center gap-1.5 bg-slate-900/60 p-1 rounded-xl border border-slate-800">
+        <div className="flex items-center justify-center gap-1 bg-slate-900/60 p-1 rounded-xl border border-slate-800 w-full sm:w-auto overflow-x-auto">
           <button 
             type="button" 
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
               filter === 'all' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
             }`}
             onClick={() => setFilter('all')}
@@ -171,7 +171,7 @@ const DebtTracker = () => {
           </button>
           <button 
             type="button" 
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
               filter === 'unpaid' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
             }`}
             onClick={() => setFilter('unpaid')}
@@ -180,7 +180,7 @@ const DebtTracker = () => {
           </button>
           <button 
             type="button" 
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
               filter === 'paid' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
             }`}
             onClick={() => setFilter('paid')}
@@ -191,7 +191,7 @@ const DebtTracker = () => {
       </div>
 
       {isFormVisible && (
-        <div className="bg-slate-900/70 p-5 rounded-2xl border border-indigo-500/20 shadow-lg space-y-4 animate-fade-in">
+        <div className="bg-slate-900/70 p-4 sm:p-5 rounded-2xl border border-indigo-500/20 shadow-lg space-y-4 animate-fade-in">
           <h3 className="text-base font-bold text-slate-100">Agregar Nueva Deuda</h3>
           <form onSubmit={handleAddDebt} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -259,13 +259,13 @@ const DebtTracker = () => {
               </div>
             </div>
 
-            <div className="flex gap-3 pt-2">
-              <button type="submit" className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold cursor-pointer">
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <button type="submit" className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold cursor-pointer text-center">
                 Guardar Deuda
               </button>
               <button 
                 type="button" 
-                className="px-4 py-2 rounded-xl text-slate-400 hover:bg-slate-800 text-sm font-medium transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 text-sm font-medium transition-colors cursor-pointer text-center"
                 onClick={() => setIsFormVisible(false)}
               >
                 Cancelar
@@ -284,15 +284,15 @@ const DebtTracker = () => {
             {filteredDebts.map(debt => {
               const paidStatus = isPaid(debt);
               return (
-                <div key={debt.id} className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
+                <div key={debt.id} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border transition-all gap-3 ${
                   paidStatus 
                     ? 'bg-emerald-500/5 border-emerald-500/20 opacity-75' 
                     : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
                 }`}>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-sm font-bold text-slate-100">{debt.name}</h4>
-                      <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="text-sm font-bold text-slate-100 truncate">{debt.name}</h4>
+                      <span className="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 shrink-0">
                         {debt.category}
                       </span>
                     </div>
@@ -301,32 +301,34 @@ const DebtTracker = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800/60">
                     <span className={`text-base font-extrabold ${paidStatus ? 'text-emerald-400 line-through' : 'text-amber-400'}`}>
                       ${Number(debt.amount).toFixed(2)}
                     </span>
 
-                    <button
-                      type="button"
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
-                        paidStatus
-                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                          : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
-                      }`}
-                      onClick={() => toggleDebtPaid(debt.id)}
-                      title={paidStatus ? 'Marcar como pendiente' : 'Marcar como pagada'}
-                    >
-                      {paidStatus ? <FiCheckCircle className="text-sm" /> : <FiCircle className="text-sm" />}
-                      <span>{paidStatus ? 'Pagado' : 'Marcar Pagado'}</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
+                          paidStatus
+                            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                            : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                        }`}
+                        onClick={() => toggleDebtPaid(debt.id)}
+                        title={paidStatus ? 'Marcar como pendiente' : 'Marcar como pagada'}
+                      >
+                        {paidStatus ? <FiCheckCircle className="text-sm" /> : <FiCircle className="text-sm" />}
+                        <span>{paidStatus ? 'Pagado' : 'Marcar Pagado'}</span>
+                      </button>
 
-                    <button 
-                      className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
-                      onClick={() => deleteDebt(debt.id)}
-                      aria-label="Eliminar deuda"
-                    >
-                      <FiTrash2 className="text-base" />
-                    </button>
+                      <button 
+                        className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                        onClick={() => deleteDebt(debt.id)}
+                        aria-label="Eliminar deuda"
+                      >
+                        <FiTrash2 className="text-base" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
