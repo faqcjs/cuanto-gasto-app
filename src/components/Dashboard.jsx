@@ -23,7 +23,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     const totalDeudas = debts.reduce((sum, debt) => (!(debt.paid || debt.isPaid) ? sum + Number(debt.amount) : sum), 0);
-    const totalGastos = gastos.reduce((acc, item) => acc + Number(item.amount), 0);
+    const totalGastos = gastos.reduce((acc, item) => acc + Math.abs(Number(item.amount)), 0);
     
     setTotalSpent(totalGastos + totalDeudas);
 

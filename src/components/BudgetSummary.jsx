@@ -75,7 +75,7 @@ const BudgetSummary = ({
           <div className="text-center py-4 bg-rose-500/5 rounded-xl border border-rose-500/20">
             <span className="text-xs uppercase font-semibold tracking-wider text-slate-400">Total Gastado</span>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-rose-400 mt-1 tracking-tight">
-              -${totalSpent.toFixed(2)}
+              ${totalSpent.toFixed(2)}
             </h1>
           </div>
 
