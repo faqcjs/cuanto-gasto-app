@@ -116,21 +116,21 @@ const BudgetTimelineChart = ({ gastos = [], incomes = [], monthlyBudget = 0 }) =
   return (
     <div className="w-full glass-card rounded-2xl p-4 sm:p-6 border border-slate-800 shadow-xl space-y-4">
       {/* Header & Filter Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
-        <div>
-          <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-            <span>Evolución Temporal</span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h2 className="text-base sm:text-lg font-bold text-slate-100 tracking-wide truncate">Evolución Temporal</h2>
+            <span className="text-[10px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 whitespace-nowrap shrink-0">
               Gastos vs. Presupuesto
             </span>
-          </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Visualización de gastos e ingresos de presupuesto a lo largo del tiempo.
+          </div>
+          <p className="text-xs text-slate-400 mt-0.5 truncate">
+            Visualización de gastos e ingresos a lo largo del tiempo.
           </p>
         </div>
 
         {/* Filter buttons */}
-        <div className="flex items-center gap-1 bg-slate-900/60 p-1 rounded-xl border border-slate-800 self-start sm:self-auto">
+        <div className="flex items-center gap-1 bg-slate-900/60 p-1 rounded-xl border border-slate-800 self-start sm:self-auto shrink-0">
           <button
             type="button"
             onClick={() => setFilterDays(7)}
@@ -163,25 +163,25 @@ const BudgetTimelineChart = ({ gastos = [], incomes = [], monthlyBudget = 0 }) =
 
       {/* Summary KPI Pills */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-slate-900/40 p-3 rounded-xl border border-slate-800/80 flex items-center gap-3">
+        <div className="bg-slate-900/40 p-3 rounded-xl border border-slate-800/80 flex items-center gap-2.5 min-w-0">
           <div className="p-2 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 shrink-0">
-            <FiTrendingDown className="text-lg" />
+            <FiTrendingDown className="text-base sm:text-lg" />
           </div>
           <div className="min-w-0">
-            <span className="text-[11px] uppercase font-semibold text-slate-400 block truncate">Gastos del Período</span>
-            <span className="text-base sm:text-lg font-extrabold text-rose-400 truncate block">
+            <span className="text-[10px] sm:text-[11px] uppercase font-semibold text-slate-400 block truncate">Gastos del Período</span>
+            <span className="text-sm sm:text-lg font-extrabold text-rose-400 truncate block">
               ${totalGastosPeriodo.toFixed(2)}
             </span>
           </div>
         </div>
 
-        <div className="bg-slate-900/40 p-3 rounded-xl border border-slate-800/80 flex items-center gap-3">
+        <div className="bg-slate-900/40 p-3 rounded-xl border border-slate-800/80 flex items-center gap-2.5 min-w-0">
           <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
-            <FiTrendingUp className="text-lg" />
+            <FiTrendingUp className="text-base sm:text-lg" />
           </div>
           <div className="min-w-0">
-            <span className="text-[11px] uppercase font-semibold text-slate-400 block truncate">Ingresos Extra</span>
-            <span className="text-base sm:text-lg font-extrabold text-emerald-400 truncate block">
+            <span className="text-[10px] sm:text-[11px] uppercase font-semibold text-slate-400 block truncate">Ingresos Extra</span>
+            <span className="text-sm sm:text-lg font-extrabold text-emerald-400 truncate block">
               ${totalIngresosPeriodo.toFixed(2)}
             </span>
           </div>
@@ -189,21 +189,21 @@ const BudgetTimelineChart = ({ gastos = [], incomes = [], monthlyBudget = 0 }) =
       </div>
 
       {/* Timeline Recharts Area Chart */}
-      <div className="w-full h-64 pt-2">
+      <div className="w-full h-60 sm:h-64 pt-2">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="gradientGastos" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.4} />
-                <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
+                <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.35} />
+                <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="gradientIngresos" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
-                <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                <stop offset="5%" stopColor="#10b981" stopOpacity={0.35} />
+                <stop offset="95%" stopColor="#10b981" stopOpacity={0.02} />
               </linearGradient>
             </defs>
 
-            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+            <CartesianGrid strokeDasharray="4 4" stroke="#1e293b" vertical={false} />
 
             <XAxis 
               dataKey="dateLabel" 
@@ -225,16 +225,16 @@ const BudgetTimelineChart = ({ gastos = [], incomes = [], monthlyBudget = 0 }) =
 
             <Legend 
               iconType="circle"
-              wrapperStyle={{ paddingTop: '10px', fontSize: '12px' }} 
+              wrapperStyle={{ paddingTop: '10px', fontSize: '11px' }} 
               formatter={(value) => <span className="text-slate-300 font-medium">{value}</span>}
             />
 
             <Area 
               type="monotone" 
               dataKey="gastos" 
-              name="Gastos ($)" 
+              name="Gastos del día ($)" 
               stroke="#f43f5e" 
-              strokeWidth={2.5} 
+              strokeWidth={3} 
               fillOpacity={1} 
               fill="url(#gradientGastos)" 
             />
@@ -244,7 +244,7 @@ const BudgetTimelineChart = ({ gastos = [], incomes = [], monthlyBudget = 0 }) =
               dataKey="ingresos" 
               name="Ingresos / Presup. Extra ($)" 
               stroke="#10b981" 
-              strokeWidth={2.5} 
+              strokeWidth={3} 
               fillOpacity={1} 
               fill="url(#gradientIngresos)" 
             />

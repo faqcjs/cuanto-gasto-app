@@ -15,10 +15,10 @@ const BudgetSummary = ({
 
   return (
     <div className="w-full glass-card rounded-2xl p-4 sm:p-6 border border-slate-800 shadow-xl space-y-5">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-slate-100 tracking-wide">Resumen de Presupuesto</h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-base sm:text-lg font-bold text-slate-100 tracking-wide truncate">Resumen de Presupuesto</h2>
         {hasBudget && (
-          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
+          <span className={`text-[10px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border shrink-0 whitespace-nowrap ${
             isOverBudget 
               ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' 
               : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'

@@ -237,30 +237,68 @@ const ExpenseCategories = ({ categories, expenses, onDeleteExpense }) => {
               </button>
             </div>
 
-            <div className="w-full h-72 py-2">
+            <div className="w-full h-80 py-2 relative flex items-center justify-center">
               {chartType === 'pie' ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie 
-                      data={categories} 
-                      cx="50%" 
-                      cy="50%" 
-                      innerRadius={isMobile ? 45 : 70} 
-                      outerRadius={isMobile ? 85 : 110} 
-                      fill="#8884d8"
-                      paddingAngle={4}
-                      dataKey="value"
-                      label={({name, value}) => isMobile ? `$${value.toFixed(0)}` : `${name}: $${value.toFixed(2)}`}
-                    >
-                      {categories.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={entry.name === 'Deudas fijas' ? DEBT_COLOR : COLORS[index % COLORS.length]} 
-                        />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="w-full h-full relative">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Tooltip 
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0];
+                            const total = categories.reduce((acc, c) => acc + c.value, 0);
+                            const percent = total > 0 ? ((data.value / total) * 100).toFixed(1) : 0;
+                            const color = data.name === 'Deudas fijas' ? DEBT_COLOR : COLORS[categories.findIndex(c => c.name === data.name) % COLORS.length];
+                            return (
+                              <div className="bg-slate-900/95 p-3 rounded-xl border border-slate-800 shadow-2xl backdrop-blur-md text-xs space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                                  <span className="font-bold text-slate-100">{data.name}</span>
+                                </div>
+                                <div className="flex items-center justify-between gap-4 pt-1">
+                                  <span className="text-slate-400">Monto:</span>
+                                  <strong className="text-slate-100 font-extrabold">${Number(data.value).toFixed(2)}</strong>
+                                </div>
+                                <div className="flex items-center justify-between gap-4">
+                                  <span className="text-slate-400">Proporción:</span>
+                                  <span className="text-indigo-400 font-semibold">{percent}%</span>
+                                </div>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }} 
+                      />
+                      <Pie 
+                        data={categories} 
+                        cx="50%" 
+                        cy="50%" 
+                        innerRadius={isMobile ? 55 : 80} 
+                        outerRadius={isMobile ? 85 : 115} 
+                        paddingAngle={4}
+                        cornerRadius={6}
+                        stroke="#090e1a"
+                        strokeWidth={2}
+                        dataKey="value"
+                      >
+                        {categories.map((entry, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={entry.name === 'Deudas fijas' ? DEBT_COLOR : COLORS[index % COLORS.length]} 
+                          />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+
+                  {/* Center Donut Label */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+                    <span className="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Total</span>
+                    <span className="text-lg sm:text-xl font-black text-slate-100 tracking-tight">
+                      ${categories.reduce((acc, c) => acc + c.value, 0).toFixed(0)}
+                    </span>
+                  </div>
+                </div>
               ) : chartType === 'bar' ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={categories} margin={{ top: 20, right: 20, left: 10, bottom: 5 }}>
@@ -291,23 +329,33 @@ const ExpenseCategories = ({ categories, expenses, onDeleteExpense }) => {
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
-              {categories.map((category, index) => (
-                <div 
-                  key={index} 
-                  className="flex items-center justify-between p-3 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 cursor-pointer transition-colors" 
-                  onClick={() => handleCategorySelect(category.name)}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span 
-                      className="w-3.5 h-3.5 rounded-full shrink-0" 
-                      style={{ backgroundColor: category.name === 'Deudas fijas' ? DEBT_COLOR : COLORS[index % COLORS.length] }}
-                    />
-                    <span className="text-sm font-medium text-slate-200">{category.name}</span>
+            {/* Category Legend Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+              {categories.map((category, index) => {
+                const total = categories.reduce((acc, c) => acc + c.value, 0);
+                const percent = total > 0 ? ((category.value / total) * 100).toFixed(1) : '0';
+                const color = category.name === 'Deudas fijas' ? DEBT_COLOR : COLORS[index % COLORS.length];
+
+                return (
+                  <div 
+                    key={index} 
+                    className="flex items-center justify-between p-3 rounded-xl bg-slate-900/50 border border-slate-800/80 hover:border-slate-700 cursor-pointer transition-all hover:translate-x-0.5" 
+                    onClick={() => handleCategorySelect(category.name)}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span 
+                        className="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm" 
+                        style={{ backgroundColor: color }}
+                      />
+                      <div className="min-w-0">
+                        <span className="text-sm font-semibold text-slate-200 block truncate">{category.name}</span>
+                        <span className="text-[10px] text-slate-400 font-medium block">{percent}% del total</span>
+                      </div>
+                    </div>
+                    <span className="text-sm font-extrabold text-slate-100 shrink-0 ml-2">${category.value.toFixed(2)}</span>
                   </div>
-                  <span className="text-sm font-bold text-slate-100">${category.value.toFixed(2)}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         ) : (
